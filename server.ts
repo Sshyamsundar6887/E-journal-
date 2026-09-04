@@ -295,6 +295,26 @@ function getLocalFallbackAnalysis(text: string) {
     sentiment = "negative";
     sentimentScore = Math.max(-0.15 * (negCount - posCount), -0.85);
     mood = normalized.includes("anxious") || normalized.includes("stress") ? "Anxious" : normalized.includes("sad") ? "Sad" : "Overwhelmed";
+  } else if (posCount > 0 && negCount > 0) {
+    // Mixed emotions - lean towards reflection
+    sentiment = "neutral";
+    sentimentScore = 0.1;
+    mood = "Reflective";
+  } else if (posCount > 0) {
+    // Only positive words found
+    sentiment = "positive";
+    sentimentScore = 0.4;
+    mood = "Optimistic";
+  } else if (negCount > 0) {
+    // Only negative words found
+    sentiment = "negative";
+    sentimentScore = -0.4;
+    mood = "Discouraged";
+  } else {
+    // No emotional keywords - use text length and complexity as heuristic
+    sentiment = "neutral";
+    sentimentScore = 0.0;
+    mood = text.length > 500 ? "Contemplative" : "Reflective";
   }
   
   const themeKeywords = [
@@ -334,8 +354,27 @@ function getLocalFallbackAnalysis(text: string) {
     if (actionItems.length >= 4) break;
   }
   
-  const textPreview = text && text.length > 80 ? text.slice(0, 80).trim() + "..." : (text || "").trim();
-  const summary = `Local Synthesis: Entry preserved successfully. [Peak demand active, cloud real-time parsing is temporarily cached]. Reflect: "${textPreview || 'Empty text'}"`;
+  // Generate a clean summary without system message clutter
+  let summary = '';
+  
+  // Extract first complete sentence or significant portion
+  const sentences = text.match(/[^.!?]*[.!?]+/g) || [];
+  const firstSentence = sentences.length > 0 ? sentences[0].trim() : text.slice(0, 120).trim();
+  
+  // Create a focused summary based on mood and content
+  if (mood === 'Anxious' || mood === 'Overwhelmed') {
+    summary = `Sensing anxiety or overwhelm. Key point: ${firstSentence}`;
+  } else if (mood === 'Excited' || mood === 'Hopeful') {
+    summary = `Positive energy detected. Reflection: ${firstSentence}`;
+  } else if (mood === 'Sad') {
+    summary = `Processing emotional difficulty. Noted: ${firstSentence}`;
+  } else if (sentiment === 'positive') {
+    summary = `Positive reflection recorded. ${firstSentence}`;
+  } else if (sentiment === 'negative') {
+    summary = `Challenging emotions present. ${firstSentence}`;
+  } else {
+    summary = `Thoughtful reflection noted. ${firstSentence}`;
+  }
   
   return {
     mood,
