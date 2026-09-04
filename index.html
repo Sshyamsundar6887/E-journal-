@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aura Journal - Secure AI Sounding Board</title>
+    <meta name="description" content="A secure, user-authenticated personal journaling application integrated with Gemini RAG semantic memory, voice speech-to-text venting, vision processing, and automated wellbeing trend mapping." />
+    <meta property="og:title" content="Aura Journal" />
+    <meta property="og:description" content="A secure, user-authenticated personal journaling application integrated with Gemini RAG semantic memory, voice speech-to-text venting, vision processing, and automated wellbeing trend mapping." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <script>
+      // Suppress benign Vite HMR websocket reconnection errors in sandboxed preview iframe
+      window.addEventListener('unhandledrejection', function (event) {
+        var reason = event.reason;
+        var msg = reason ? (reason.message || String(reason)) : '';
+        if (
+          msg.indexOf('WebSocket closed without opened') !== -1 ||
+          msg.indexOf('[vite] failed to connect to websocket') !== -1
+        ) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+      });
+      window.addEventListener('error', function (event) {
+        var msg = event.message || '';
+        if (
+          msg.indexOf('WebSocket closed without opened') !== -1 ||
+          msg.indexOf('[vite] failed to connect to websocket') !== -1
+        ) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+

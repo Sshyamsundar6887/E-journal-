@@ -1,0 +1,46 @@
+{
+  "entities": {
+    "JournalEntry": {
+      "title": "JournalEntry",
+      "description": "A user's personal reflection journal entry",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "title": { "type": "string" },
+        "content": { "type": "string" },
+        "date": { "type": "string" },
+        "mood": { "type": "string" },
+        "sentiment": { "type": "string", "enum": ["positive", "neutral", "negative"] },
+        "sentimentScore": { "type": "number" },
+        "themes": { "type": "array" },
+        "summary": { "type": "string" },
+        "actionItems": { "type": "array" },
+        "imageUrl": { "type": "string" },
+        "embedding": { "type": "array" },
+        "createdAt": { "type": "number" }
+      },
+      "required": ["id", "userId", "title", "content", "date", "createdAt"]
+    },
+    "SyncSettings": {
+      "title": "SyncSettings",
+      "description": "User preferences for Google Workspace sync",
+      "type": "object",
+      "properties": {
+        "calendarEnabled": { "type": "boolean" },
+        "tasksEnabled": { "type": "boolean" },
+        "promptOnSave": { "type": "boolean" }
+      }
+    }
+  },
+  "firestore": {
+    "/users/{userId}/entries/{entryId}": {
+      "schema": "JournalEntry",
+      "description": "User journal entries collection"
+    },
+    "/users/{userId}/settings/sync": {
+      "schema": "SyncSettings",
+      "description": "User sync configuration document"
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "Remix Aura Journal",
+  "description": "A secure, user-authenticated personal journaling application integrated with Gemini RAG semantic memory, voice speech-to-text venting, vision processing, and automated wellbeing trend mapping.",
+  "requestFramePermissions": [
+    "microphone"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
