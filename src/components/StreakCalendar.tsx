@@ -98,21 +98,21 @@ export default function StreakCalendar({ entries, onSelectEntry }: StreakCalenda
   return (
     <div className="bg-[#0F1115] border border-[#1F2229] p-5 rounded-xl space-y-5">
       {/* Streak Header Indicator */}
-      <div className="flex items-center justify-between bg-gradient-to-r from-indigo-500/10 to-purple-600/15 border border-indigo-500/20 p-4 rounded-lg">
+      <div className="flex items-center justify-between bg-zinc-900 border border-zinc-800 p-4 rounded-xl">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-indigo-500/10 flex items-center justify-center border border-indigo-500/30 animate-pulse text-indigo-400">
-            <Flame className="w-5.5 h-5.5 text-indigo-400" />
+          <div className="w-10 h-10 rounded-full bg-zinc-800 flex items-center justify-center border border-zinc-700 text-zinc-200">
+            <Flame className="w-5 h-5 text-zinc-300" />
           </div>
           <div>
-            <h4 className="text-xs uppercase tracking-wider text-slate-400 font-bold">Reflection Streak</h4>
-            <p className="text-[10px] text-slate-500">Consecutive days journaling</p>
+            <h4 className="text-xs uppercase tracking-wider text-zinc-400 font-bold">Reflection Streak</h4>
+            <p className="text-[10px] text-zinc-500">Consecutive days journaling</p>
           </div>
         </div>
         <div className="text-right">
-          <span className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 font-mono">
+          <span className="text-2xl font-black text-white font-mono">
             {streak}
           </span>
-          <span className="text-xs text-indigo-300 font-bold ml-1">Days</span>
+          <span className="text-xs text-zinc-400 font-bold ml-1">Days</span>
         </div>
       </div>
 
@@ -121,7 +121,7 @@ export default function StreakCalendar({ entries, onSelectEntry }: StreakCalenda
         {/* Navigation Row */}
         <div className="flex items-center justify-between border-b border-[#1F2229] pb-3">
           <div className="flex items-center gap-2">
-            <CalendarIcon className="w-4 h-4 text-indigo-400" />
+            <CalendarIcon className="w-4 h-4 text-zinc-400" />
             <h4 className="text-xs uppercase tracking-wider text-slate-300 font-bold">
               {monthNames[month]} {year}
             </h4>
@@ -144,18 +144,15 @@ export default function StreakCalendar({ entries, onSelectEntry }: StreakCalenda
           </div>
         </div>
 
-        {/* Days Grid Header */}
-        <div className="grid grid-cols-7 gap-1 text-center">
-          {weekdays.map((wd, idx) => (
-            <span key={idx} className="text-[9px] font-bold text-slate-500 uppercase tracking-wider py-1">
-              {wd}
+        {/* Days grid */}
+        <div className="grid grid-cols-7 gap-2 text-center text-xs">
+          {weekdays.map((day) => (
+            <span key={day} className="text-[10px] font-mono text-slate-500 uppercase tracking-widest font-semibold py-1">
+              {day}
             </span>
           ))}
-        </div>
 
-        {/* Days Grid Rows */}
-        <div className="grid grid-cols-7 gap-1.5">
-          {/* Empty spacer blocks */}
+          {/* Empty prefix padding days */}
           {Array.from({ length: firstDayIndex }).map((_, idx) => (
             <div key={`empty-${idx}`} className="h-9" />
           ))}
@@ -177,14 +174,14 @@ export default function StreakCalendar({ entries, onSelectEntry }: StreakCalenda
                 }}
                 className={`h-9 flex flex-col items-center justify-center rounded-lg text-xs relative transition group font-mono ${
                   hasEntry
-                    ? 'bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 hover:bg-indigo-500/25 active:scale-95 cursor-pointer shadow-lg shadow-indigo-500/5'
+                    ? 'bg-zinc-800 border border-zinc-600 text-white hover:bg-zinc-700 active:scale-95 cursor-pointer shadow-md shadow-black/30'
                     : 'bg-[#15171C]/40 border border-transparent text-slate-600'
                 }`}
                 title={hasEntry ? `${dayEntries.length} reflection(s) recorded` : "No reflection"}
               >
                 <span>{dayNum}</span>
                 {hasEntry && (
-                  <span className="absolute bottom-1 w-1 h-1 bg-indigo-400 rounded-full animate-pulse" />
+                  <span className="absolute bottom-1 w-1 h-1 bg-zinc-200 rounded-full animate-pulse" />
                 )}
               </button>
             );

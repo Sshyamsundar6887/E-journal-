@@ -13,7 +13,7 @@ interface JournalEditorProps {
 export default function JournalEditor({
   onSaveEntry,
   appMode = 'cloud',
-  selectedModelName = 'Llama 3 8B',
+  selectedModelName = 'DistilBERT Sentiment',
 }: JournalEditorProps) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
@@ -199,7 +199,7 @@ export default function JournalEditor({
 
       <form onSubmit={handleSave} className="space-y-4">
         {/* Main Editor Text Area with inner controls in a unified elegant dark box */}
-        <div className="bg-[#0B0C0F] rounded-2xl border border-[#15161C] p-5 md:p-6 flex flex-col min-h-[440px] focus-within:border-indigo-500/20 transition-all duration-300 relative">
+        <div className="bg-[#0B0C0F] rounded-2xl border border-[#15161C] p-5 md:p-6 flex flex-col min-h-[440px] focus-within:border-zinc-700 transition-all duration-300 relative">
           {/* Optional Title input embedded borderless at top of text block */}
           <input
             type="text"
@@ -224,13 +224,13 @@ export default function JournalEditor({
             <div className="relative inline-flex items-center gap-3 self-start mt-2 mb-4 border border-[#1F2229] rounded-xl p-2 bg-[#121318] shrink-0 animate-fade-in">
               <img src={imagePreview} alt="Attached page" className="h-20 w-auto rounded-lg object-cover border border-[#1F2229]" />
               <div className="text-left pr-4">
-                <span className="text-[10px] font-bold text-indigo-400 block uppercase tracking-wide">Image Attached</span>
+                <span className="text-[10px] font-bold text-zinc-300 block uppercase tracking-wide">Image Attached</span>
                 <span className="text-[9px] text-slate-400 block">Will be saved directly to your history archive</span>
               </div>
               <button
                 type="button"
                 onClick={removeImage}
-                className="absolute -top-2 -right-2 bg-[#18112C] hover:bg-[#20173A] text-white rounded-full p-1 shadow-md border border-[#342466] transition"
+                className="absolute -top-2 -right-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-full p-1 shadow-md border border-zinc-600 transition"
                 title="Remove photo"
               >
                 <X className="w-3 h-3" />

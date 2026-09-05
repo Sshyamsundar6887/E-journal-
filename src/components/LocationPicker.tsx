@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { MapPin, X, Navigation } from 'lucide-react';
 import { EntryLocation } from '../types';
 
+declare const google: any;
+
 interface LocationPickerProps {
   location: EntryLocation | null;
   onChange: (location: EntryLocation | null) => void;
@@ -105,7 +107,7 @@ export default function LocationPicker({ location, onChange, onClose }: Location
     <div className="mt-3 rounded-xl border border-[#2A2D3A] bg-[#14161E] p-4 space-y-3 animate-in fade-in duration-200">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2 text-sm font-medium text-slate-300">
-          <MapPin className="w-4 h-4 text-indigo-400" />
+          <MapPin className="w-4 h-4 text-zinc-300" />
           <span>Add Location</span>
         </div>
         <button
@@ -129,12 +131,12 @@ export default function LocationPicker({ location, onChange, onClose }: Location
             }
           }}
           placeholder="Enter a location name..."
-          className="flex-1 px-3 py-2 text-sm rounded-lg border border-[#2A2D3A] bg-[#1A1C28] text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+          className="flex-1 px-3 py-2 text-sm rounded-lg border border-[#2A2D3A] bg-[#1A1C28] text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-1 focus:ring-zinc-500 focus:border-zinc-500 transition-colors"
         />
         <button
           onClick={handleManualSubmit}
           disabled={!locationName.trim()}
-          className="px-3 py-2 text-sm rounded-lg bg-indigo-600 text-white hover:bg-indigo-500 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+          className="px-3 py-2 text-sm rounded-lg bg-zinc-100 text-black hover:bg-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors font-semibold"
         >
           Set
         </button>

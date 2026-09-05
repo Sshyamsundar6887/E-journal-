@@ -72,6 +72,7 @@ export interface LocalModelMeta {
   downloadProgress: number; // 0 to 100
   isDownloading: boolean;
   cachedAt?: number;
+  hfModelId?: string;
 }
 
 export interface LocalDatabaseStats {

@@ -90,7 +90,7 @@ Verify system integrity using the step-by-step cases below:
 
 ### Test Case 1: Google Identity Federated Auth
 - **Action**: Visit the landing page, click the **Continue with Google Sign-In** button.
-- **Expected Outcome**: Google login popup prompts for credentials. After authentication, the secure handshake passes successfully, loading the private Aura workspace.
+- **Expected Outcome**: Google login popup prompts for credentials. After authentication, the secure handshake passes successfully, loading the private Echo Mind workspace.
 
 ### Test Case 2: Frictionless Capture & Analysis
 - **Action**: Enter a title and write: *"I had a deeply exhausting work day today. Finished our release milestones, but feeling totally burned out and drained."* Click **Save Securely**.
