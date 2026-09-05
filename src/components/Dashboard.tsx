@@ -459,7 +459,6 @@ export default function Dashboard() {
     if (!currentUser) throw new Error("Authentication session expired.");
 
     const token = await currentUser.getIdToken();
-    localStorage.setItem("aura_user_token", token);
 
     // Call API Route to generate structured analysis on text (zero image AI processing)
     const res = await fetch("/api/analyze-entry", {
@@ -727,7 +726,8 @@ export default function Dashboard() {
     }
 
     try {
-      const token = localStorage.getItem("aura_user_token");
+      if (!currentUser) throw new Error("Session expired.");
+      const token = await currentUser.getIdToken();
       const cleanRecent = entries.slice(0, 5).map(e => ({
         content: e.content,
         mood: e.mood,

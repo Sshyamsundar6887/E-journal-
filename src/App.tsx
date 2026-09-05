@@ -12,14 +12,6 @@ export default function App() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
-      if (currentUser) {
-        // Cache ID Token for server API routes
-        currentUser.getIdToken().then((token) => {
-          localStorage.setItem("aura_user_token", token);
-        });
-      } else {
-        localStorage.removeItem("aura_user_token");
-      }
       setLoading(false);
     });
 
@@ -40,4 +32,3 @@ export default function App() {
   // The user MUST be logged in to access the application, local models, and data
   return user ? <Dashboard /> : <LandingPage onAuthSuccess={() => {}} />;
 }
-
