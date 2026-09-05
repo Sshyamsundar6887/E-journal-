@@ -34,14 +34,14 @@ export default function ActionItems({ items, onToggleItem, onAddItem, onDeleteIt
             <button
               type="button"
               onClick={onOpenSync}
-              className="inline-flex items-center gap-1.5 text-[11px] font-bold text-indigo-300 bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 px-2.5 py-1 rounded-md transition cursor-pointer"
+              className="inline-flex items-center gap-1.5 text-[11px] font-bold text-zinc-200 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 px-2.5 py-1 rounded-md transition cursor-pointer"
               title="Sync actions with Google Workspace"
             >
-              <Calendar className="w-3 h-3 text-indigo-400" />
+              <Calendar className="w-3 h-3 text-zinc-300" />
               <span>Sync to Google</span>
             </button>
           )}
-          <span className="text-xs bg-indigo-500/10 border border-indigo-500/20 px-2.5 py-1 rounded-md text-indigo-300 font-sans">
+          <span className="text-xs bg-zinc-800 border border-zinc-700 px-2.5 py-1 rounded-md text-zinc-300 font-sans">
             {completedCount}/{items.length} Done
           </span>
         </div>
@@ -67,7 +67,7 @@ export default function ActionItems({ items, onToggleItem, onAddItem, onDeleteIt
                 className="flex items-center gap-2.5 text-left flex-1"
               >
                 {item.completed ? (
-                  <CheckSquare className="w-4.5 h-4.5 text-indigo-400 shrink-0" />
+                  <CheckSquare className="w-4.5 h-4.5 text-zinc-200 shrink-0" />
                 ) : (
                   <Square className="w-4.5 h-4.5 text-slate-600 hover:text-slate-400 shrink-0" />
                 )}
@@ -97,11 +97,11 @@ export default function ActionItems({ items, onToggleItem, onAddItem, onDeleteIt
           placeholder="Add manual goal..."
           value={newItemText}
           onChange={(e) => setNewItemText(e.target.value)}
-          className="flex-1 text-xs border border-[#1F2229] rounded-lg px-3 py-2 bg-[#15171C] text-white placeholder-slate-600 focus:outline-none focus:border-indigo-500/50 transition"
+          className="flex-1 text-xs border border-[#1F2229] rounded-lg px-3 py-2 bg-[#15171C] text-white placeholder-slate-600 focus:outline-none focus:border-zinc-500 transition"
         />
         <button
           type="submit"
-          className="bg-indigo-600 hover:bg-indigo-500 text-white p-2 rounded-lg transition active:scale-95 shrink-0"
+          className="bg-zinc-100 hover:bg-white text-black p-2 rounded-lg transition active:scale-95 shrink-0"
         >
           <Plus className="w-4 h-4" />
         </button>

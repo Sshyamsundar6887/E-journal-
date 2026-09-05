@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { auth, db, handleFirestoreError, OperationType } from '../lib/firebase';
-import { JournalEntry, ChatMessage, MoodTrendPoint, ActionItem, AppMode, LocalModelId } from '../types';
+import { JournalEntry, ChatMessage, MoodTrendPoint, ActionItem, AppMode, LocalModelId, EntryLocation } from '../types';
 import { collection, onSnapshot, query, orderBy, setDoc, doc, updateDoc, deleteDoc } from 'firebase/firestore';
-import { LogOut, User, Sparkles, BookOpen, Calendar, ChevronRight, Activity, Eye, Trash2, MessageCircle, Settings, X, Image as ImageIcon, ZoomIn, Download, FileText, Table, Copy, Check, Database, Cloud, Cpu, Shield, HardDrive } from 'lucide-react';
+import { LogOut, User, Sparkles, BookOpen, Calendar, ChevronRight, Activity, Eye, Trash2, MessageCircle, Settings, X, Image as ImageIcon, ZoomIn, Download, FileText, Table, Copy, Check, Database, Cloud, Cpu, Shield, HardDrive, MapPin } from 'lucide-react';
 import JournalEditor from './JournalEditor';
 import MoodChart from './MoodChart';
 import ActionItems from './ActionItems';
@@ -12,6 +12,7 @@ import LocalModelManager from './LocalModelManager';
 import { exportEntriesToCsv, exportEntriesToPdf } from '../utils/exportUtils';
 import {
   getCachedAccessToken,
+  clearCachedAccessToken,
   googleWorkspaceSignIn,
   createCalendarEvent,
   createGoogleTask
@@ -83,6 +84,11 @@ export default function Dashboard() {
   const [promptCopied, setPromptCopied] = useState(false);
 
   const currentUser = auth.currentUser;
+
+  // Prevent a Workspace token from surviving logout or a Firebase user switch.
+  useEffect(() => {
+    clearCachedAccessToken();
+  }, [currentUser?.uid]);
 
   // Real-time listener for Journal Entries (Firestore for Cloud Mode, IndexedDB for Local Mode)
   useEffect(() => {
@@ -339,7 +345,7 @@ export default function Dashboard() {
           
           await createCalendarEvent(token, {
             summary: task.text,
-            description: "Generated from your Aura Journal secure reflection.",
+            description: "Generated from your Echo Mind secure reflection.",
             startDateTime: start.toISOString(),
             endDateTime: end.toISOString()
           });
@@ -348,7 +354,7 @@ export default function Dashboard() {
         if (task.syncTasks) {
           await createGoogleTask(token, {
             title: task.text,
-            notes: "Created from Aura Journal",
+            notes: "Created from Echo Mind",
             dueDateTime: task.tasksDueDate
           });
         }
@@ -378,12 +384,18 @@ export default function Dashboard() {
   };
 
   // Handle Google Log Out
-  const handleSignOut = () => {
-    auth.signOut();
+  const handleSignOut = async () => {
+    clearCachedAccessToken();
+    await auth.signOut();
   };
 
   // Secure Save Journal Entry
-  const handleSaveEntry = async (title: string, content: string, imageBase64: string | null) => {
+  const handleSaveEntry = async (
+    title: string,
+    content: string,
+    imageBase64: string | null,
+    location?: EntryLocation | null
+  ) => {
     // 1. FULL-LOCAL MODE: Execute on-device model and save to local IndexedDB
     if (appMode === 'local') {
       if (!isModelDownloaded(selectedLocalModel)) {
@@ -417,6 +429,7 @@ export default function Dashboard() {
         summary: analysis.summary || "",
         actionItems: actionItemsWithIds,
         imageUrl: imageBase64 || undefined,
+        location: location || undefined,
         embedding: analysis.embedding || [],
         createdAt: Date.now()
       };
@@ -500,6 +513,7 @@ export default function Dashboard() {
       summary: analysis.summary || "",
       actionItems: actionItemsWithIds,
       imageUrl: imageBase64 || undefined,
+      location: location || undefined,
       embedding: analysis.embedding || [],
       createdAt: Date.now()
     };
@@ -831,37 +845,29 @@ export default function Dashboard() {
     .slice(0, 6);
 
   return (
-    <div className="min-h-screen bg-[#08080A] text-[#E2E8F0] flex flex-col md:flex-row font-sans selection:bg-indigo-500/30 overflow-hidden">
+    <div className="min-h-screen bg-[#08080A] text-[#E2E8F0] flex flex-col md:flex-row font-sans selection:bg-zinc-800 overflow-hidden">
       
       {/* MOBILE HEADER: Visible only on small devices */}
       <header className="md:hidden flex items-center justify-between bg-[#050505] border-b border-[#121318] px-5 py-4 shrink-0 z-50">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#5D5FEF] via-[#7B61FF] to-[#A452F6] flex items-center justify-center shadow-md shrink-0">
+          <div className="w-8 h-8 rounded-xl bg-zinc-800 border border-zinc-700 flex items-center justify-center shadow-md shrink-0">
             <BookOpen className="w-4 h-4 text-white stroke-[2.2]" />
           </div>
           <h1 className="text-lg font-bold tracking-tight flex items-baseline gap-1 leading-none select-none">
-            <span className="text-white flex items-baseline">
-              <span
-                className="relative inline-block font-extrabold"
-                style={{ textShadow: "-1.2px 0px 0px #00D2FF, 1.2px 0px 0px #FF9500" }}
-              >
-                A
-              </span>
-              <span className="font-bold">ura</span>
-            </span>
-            <span className="font-medium text-[#4F75FF]">Journal</span>
+            <span className="text-white font-bold">Echo</span>
+            <span className="font-medium text-slate-400">Mind</span>
           </h1>
         </div>
         <div className="flex items-center gap-3">
           <button
             onClick={() => setActiveTab(activeTab === 'settings' ? 'chamber' : 'settings')}
-            className="px-2 py-1 bg-[#15171C] border border-[#121318] rounded-lg text-[10px] font-bold text-indigo-400 cursor-pointer"
+            className="px-2 py-1 bg-[#15171C] border border-[#121318] rounded-lg text-[10px] font-bold text-zinc-300 cursor-pointer"
           >
             {activeTab === 'settings' ? 'WRITE' : 'SETTINGS'}
           </button>
           <button
             onClick={() => setIsChatOpen(!isChatOpen)}
-            className="p-1.5 rounded border border-[#121318] text-indigo-400"
+            className="p-1.5 rounded border border-[#121318] text-zinc-300"
           >
             <MessageCircle className="w-4 h-4" />
           </button>
@@ -877,22 +883,14 @@ export default function Dashboard() {
       {/* COLUMN 1: LEFT SIDEBAR (Desktop only) */}
       <aside className="w-64 bg-[#050505] border-r border-[#121318] hidden md:flex flex-col justify-between p-6 shrink-0 h-screen select-none">
         <div>
-          {/* Logo Brand matching Aura Journal reference image */}
+          {/* Logo Brand matching Echo Mind reference image */}
           <div className="mb-10 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#5D5FEF] via-[#7B61FF] to-[#A452F6] flex items-center justify-center shadow-lg shadow-indigo-500/20 shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-zinc-800 border border-zinc-700 flex items-center justify-center shadow-lg shadow-black/40 shrink-0">
               <BookOpen className="w-5 h-5 text-white stroke-[2.2]" />
             </div>
             <h1 className="text-xl font-bold tracking-tight flex items-baseline gap-1.5 leading-none select-none">
-              <span className="text-white flex items-baseline">
-                <span
-                  className="relative inline-block font-extrabold"
-                  style={{ textShadow: "-1.5px 0px 0px #00D2FF, 1.5px 0px 0px #FF9500" }}
-                >
-                  A
-                </span>
-                <span className="font-bold">ura</span>
-              </span>
-              <span className="font-medium text-[#4F75FF]">Journal</span>
+              <span className="text-white font-bold">Echo</span>
+              <span className="font-medium text-slate-400">Mind</span>
             </h1>
           </div>
 
@@ -911,7 +909,7 @@ export default function Dashboard() {
                       : 'text-slate-500 hover:text-slate-300'
                   }`}
                 >
-                  <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${activeTab === 'chamber' || activeTab === 'insights' ? 'bg-indigo-500' : 'bg-transparent border border-slate-700'}`} />
+                  <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${activeTab === 'chamber' || activeTab === 'insights' ? 'bg-zinc-200' : 'bg-transparent border border-slate-700'}`} />
                   <span>Daily Log</span>
                 </button>
                 <button
@@ -922,7 +920,7 @@ export default function Dashboard() {
                       : 'text-slate-500 hover:text-slate-300'
                   }`}
                 >
-                  <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${activeTab === 'history' ? 'bg-indigo-500' : 'bg-transparent border border-slate-700'}`} />
+                  <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${activeTab === 'history' ? 'bg-zinc-200' : 'bg-transparent border border-slate-700'}`} />
                   <span>Reflections</span>
                 </button>
                 <button
@@ -933,7 +931,7 @@ export default function Dashboard() {
                       : 'text-slate-500 hover:text-slate-300'
                   }`}
                 >
-                  <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${activeTab === 'settings' ? 'bg-[#8170D4]' : 'bg-transparent border border-slate-700'}`} />
+                  <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${activeTab === 'settings' ? 'bg-zinc-200' : 'bg-transparent border border-slate-700'}`} />
                   <span>Sync Settings</span>
                 </button>
               </nav>
@@ -947,7 +945,7 @@ export default function Dashboard() {
             <div className="text-xs font-bold text-slate-300 truncate font-sans">
               {currentUser?.displayName || currentUser?.email?.split('@')[0] || 'secure_user'}
             </div>
-            <div className="text-[9px] text-indigo-400 font-sans font-semibold tracking-wider mt-0.5">
+            <div className="text-[9px] text-zinc-400 font-sans font-semibold tracking-wider mt-0.5">
               Auth: Google Secure
             </div>
           </div>
@@ -981,7 +979,7 @@ export default function Dashboard() {
                 >
                   Active Entry
                   {activeTab === 'chamber' && (
-                    <span className="absolute -bottom-3.5 left-0 right-0 h-0.5 bg-indigo-500 rounded-full" />
+                    <span className="absolute -bottom-3.5 left-0 right-0 h-0.5 bg-zinc-200 rounded-full" />
                   )}
                 </button>
                 <button
@@ -992,7 +990,7 @@ export default function Dashboard() {
                 >
                   Past Insights
                   {activeTab === 'insights' && (
-                    <span className="absolute -bottom-3.5 left-0 right-0 h-0.5 bg-indigo-500 rounded-full" />
+                    <span className="absolute -bottom-3.5 left-0 right-0 h-0.5 bg-zinc-200 rounded-full" />
                   )}
                 </button>
               </>
@@ -1005,14 +1003,14 @@ export default function Dashboard() {
             onClick={() => setActiveTab('settings')}
             className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold font-mono transition cursor-pointer ${
               appMode === 'cloud'
-                ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 hover:bg-indigo-500/20'
+                ? 'bg-zinc-800 text-zinc-300 border border-zinc-700 hover:bg-zinc-700'
                 : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500/20'
             }`}
             title="Configure Cloud vs Local Mode and model downloads"
           >
             {appMode === 'cloud' ? (
               <>
-                <Cloud className="w-3 h-3 text-indigo-400" />
+                <Cloud className="w-3 h-3 text-zinc-300" />
                 <span>Cloud API • Gemini</span>
               </>
             ) : (
@@ -1054,8 +1052,8 @@ export default function Dashboard() {
                       setSyncDialogTasks(allActionItems.map(item => ({
                         id: item.id,
                         text: item.text,
-                        syncCalendar: syncSettings.calendarEnabled || true,
-                        syncTasks: syncSettings.tasksEnabled || true,
+                        syncCalendar: syncSettings.calendarEnabled,
+                        syncTasks: syncSettings.tasksEnabled,
                         calendarTime: getTomorrowDateTimeString(),
                         tasksDueDate: getTomorrowDateString()
                       })));
@@ -1076,11 +1074,11 @@ export default function Dashboard() {
                       themeCloud.map((tc, idx) => (
                         <div
                           key={idx}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-xs font-semibold text-indigo-300"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800 border border-zinc-700 text-xs font-semibold text-zinc-200"
                         >
-                          <Sparkles className="w-3 h-3 text-indigo-400 animate-pulse" />
+                          <Sparkles className="w-3 h-3 text-zinc-400 animate-pulse" />
                           <span>{tc.theme}</span>
-                          <span className="text-[10px] font-mono font-bold bg-indigo-500/20 px-1.5 py-0.5 rounded text-indigo-300">
+                          <span className="text-[10px] font-mono font-bold bg-zinc-700 px-1.5 py-0.5 rounded text-zinc-300">
                             {tc.count}
                           </span>
                         </div>
@@ -1123,7 +1121,7 @@ export default function Dashboard() {
 
               <div className="xl:col-span-5 bg-[#0F1115] p-5 rounded-xl border border-[#1F2229] space-y-4">
                 <div className="flex items-center justify-between border-b border-[#1F2229] pb-2.5 flex-wrap gap-2">
-                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2">
                     <h3 className="font-bold text-xs uppercase tracking-wider text-slate-400 font-sans">Historical Archives</h3>
                     <span className="text-[10px] bg-slate-800/40 text-slate-400 px-2.5 py-0.5 rounded font-mono font-bold border border-[#1F2229]">
                       {entries.length} logs
@@ -1135,10 +1133,10 @@ export default function Dashboard() {
                       <button
                         type="button"
                         onClick={() => exportEntriesToPdf(entries)}
-                        className="inline-flex items-center gap-1 text-[10px] font-semibold text-indigo-300 hover:text-white bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/20 hover:border-indigo-500/40 px-2 py-1 rounded-md transition active:scale-95 cursor-pointer"
+                        className="inline-flex items-center gap-1 text-[10px] font-semibold text-zinc-300 hover:text-white bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 hover:border-zinc-600 px-2 py-1 rounded-md transition active:scale-95 cursor-pointer"
                         title="Export all journal entries to PDF backup"
                       >
-                        <FileText className="w-3 h-3 text-indigo-400" />
+                        <FileText className="w-3 h-3 text-zinc-300" />
                         <span>PDF</span>
                       </button>
 
@@ -1166,7 +1164,7 @@ export default function Dashboard() {
                         key={entry.id}
                         className={`p-3.5 rounded-xl border text-left space-y-2.5 transition ${
                           activeEntry?.id === entry.id
-                            ? 'border-indigo-500/40 bg-[#15171C] shadow-none'
+                            ? 'border-zinc-500 bg-[#15171C] shadow-none'
                             : 'border-[#1F2229] hover:border-slate-700 bg-[#0F1115]'
                         }`}
                       >
@@ -1178,15 +1176,20 @@ export default function Dashboard() {
                                 {new Date(entry.date).toLocaleDateString()}
                               </span>
                               {entry.imageUrl && (
-                                <span className="inline-flex items-center gap-1 text-[8px] font-bold text-indigo-400 bg-indigo-500/10 px-1.5 py-0.5 rounded border border-indigo-500/20 uppercase tracking-wider">
+                                <span className="inline-flex items-center gap-1 text-[8px] font-bold text-zinc-300 bg-zinc-800 px-1.5 py-0.5 rounded border border-zinc-700 uppercase tracking-wider">
                                   <ImageIcon className="w-2.5 h-2.5" /> Photo Saved
+                                </span>
+                              )}
+                              {entry.location && (
+                                <span className="inline-flex items-center gap-1 text-[8px] font-medium text-slate-300 bg-slate-800/80 px-1.5 py-0.5 rounded border border-[#1F2229]">
+                                  <MapPin className="w-2.5 h-2.5 text-emerald-400" /> {entry.location.name}
                                 </span>
                               )}
                             </div>
                             <h5 className="font-bold text-xs text-white truncate mt-1">{entry.title}</h5>
                           </div>
 
-                          <span className="text-[9px] font-bold px-2 py-0.5 bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 rounded uppercase tracking-wide shrink-0">
+                          <span className="text-[9px] font-bold px-2 py-0.5 bg-zinc-800 border border-zinc-700 text-zinc-300 rounded uppercase tracking-wide shrink-0">
                             {entry.mood}
                           </span>
                         </div>
@@ -1196,63 +1199,41 @@ export default function Dashboard() {
                             <button
                               type="button"
                               onClick={() => setLightboxImage(entry.imageUrl || null)}
-                              className="relative group shrink-0 h-16 w-16 rounded-lg overflow-hidden border border-[#1F2229] hover:border-indigo-500/50 bg-[#14151B] cursor-pointer transition"
+                              className="relative group shrink-0 h-16 w-16 rounded-lg overflow-hidden border border-[#1F2229] hover:border-zinc-500 bg-[#14151B] cursor-pointer transition"
                               title="Click to expand photo"
                             >
                               <img
                                 src={entry.imageUrl}
                                 alt="Archived reflection photo"
-                                className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-110"
+                                className="h-full w-full object-cover group-hover:scale-105 transition"
                               />
-                              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                                <ZoomIn className="w-4 h-4 text-white" />
+                            </button>
+                          )}
+
+                          <div className="flex-1 min-w-0 space-y-1.5">
+                            <p className="text-xs text-slate-300 line-clamp-2 leading-relaxed">
+                              {entry.content}
+                            </p>
+
+                            {entry.themes && entry.themes.length > 0 && (
+                              <div className="flex flex-wrap gap-1 pt-1">
+                                {entry.themes.map((t, i) => (
+                                  <span key={i} className="text-[8px] bg-slate-800/40 border border-[#1F2229] text-zinc-300 px-1.5 py-0.5 rounded">
+                                    #{t}
+                                  </span>
+                                ))}
                               </div>
-                            </button>
-                          )}
-                          <p className="text-[11px] text-slate-400 line-clamp-3 leading-relaxed flex-1">
-                            {entry.content || (entry.imageUrl ? "Visual log entry with saved photo." : "")}
-                          </p>
-                        </div>
+                            )}
+                          </div>
 
-                        <div className="flex items-center justify-between pt-1 border-t border-[#1F2229]">
-                          {entry.themes && entry.themes.length > 0 && (
-                            <div className="flex gap-1.5 flex-wrap">
-                              {entry.themes.slice(0, 3).map((t, i) => (
-                                <span key={i} className="text-[8px] bg-slate-800/40 border border-[#1F2229] text-indigo-300 px-1.5 py-0.5 rounded">
-                                  #{t}
-                                </span>
-                              ))}
-                            </div>
-                          )}
-
-                          <div className="flex items-center gap-1.5 ml-auto">
+                          <div className="flex items-center gap-1 shrink-0 self-center">
                             <button
-                              onClick={() => exportEntriesToPdf([entry], `aura_entry_${(entry.title || 'reflection').replace(/[^a-zA-Z0-9_-]/g, '_').toLowerCase()}`)}
-                              className="p-1 hover:bg-[#15171C] rounded text-slate-400 hover:text-indigo-300 cursor-pointer transition"
-                              title="Export this entry to PDF"
-                            >
-                              <FileText className="w-3.5 h-3.5" />
-                            </button>
-                            <button
-                              onClick={() => exportEntriesToCsv([entry], `aura_entry_${(entry.title || 'reflection').replace(/[^a-zA-Z0-9_-]/g, '_').toLowerCase()}`)}
-                              className="p-1 hover:bg-[#15171C] rounded text-slate-400 hover:text-emerald-300 cursor-pointer transition"
-                              title="Export this entry to CSV"
-                            >
-                              <Table className="w-3.5 h-3.5" />
-                            </button>
-                            <button
-                              onClick={() => setActiveEntry(activeEntry?.id === entry.id ? null : entry)}
+                              type="button"
+                              onClick={() => setActiveEntry(entry)}
+                              title="Inspect full reflection summary"
                               className="p-1 hover:bg-[#15171C] rounded text-slate-400 hover:text-white cursor-pointer transition"
-                              title="Quick View"
                             >
-                              <Eye className="w-3.5 h-3.5" />
-                            </button>
-                            <button
-                              onClick={() => handleDeleteEntry(entry.id)}
-                              className="p-1 hover:bg-[#15171C] rounded text-rose-400 cursor-pointer transition"
-                              title="Delete Permanently"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
+                              <ChevronRight className="w-4 h-4" />
                             </button>
                           </div>
                         </div>
@@ -1264,15 +1245,16 @@ export default function Dashboard() {
                               <div className="space-y-1.5">
                                 <div className="flex items-center justify-between">
                                   <span className="text-[9px] font-bold text-slate-400 uppercase tracking-wide flex items-center gap-1">
-                                    <ImageIcon className="w-3 h-3 text-indigo-400" />
+                                    <ImageIcon className="w-3 h-3 text-zinc-400" />
                                     Archived Visual Page
                                   </span>
                                   <button
                                     type="button"
-                                    onClick={() => setLightboxImage(entry.imageUrl || null)}
-                                    className="text-[10px] text-indigo-400 hover:text-indigo-300 font-semibold flex items-center gap-1 cursor-pointer transition"
+                                    onClick={() => setLightboxImage(activeEntry.imageUrl || null)}
+                                    className="text-[10px] text-zinc-300 hover:text-white font-semibold flex items-center gap-1 cursor-pointer transition"
                                   >
-                                    <ZoomIn className="w-3 h-3" /> Full Size
+                                    <ImageIcon className="w-3 h-3 text-zinc-300" />
+                                    <span>View Photo</span>
                                   </button>
                                 </div>
                                 <div className="border border-[#1F2229] rounded-lg overflow-hidden bg-black/40 flex items-center justify-center p-1">
@@ -1283,6 +1265,12 @@ export default function Dashboard() {
                                     className="max-h-48 w-auto rounded object-contain cursor-pointer hover:opacity-95 transition"
                                   />
                                 </div>
+                              </div>
+                            )}
+                            {entry.location && (
+                              <div className="flex items-center gap-1.5 text-xs text-slate-300">
+                                <MapPin className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                                <span>{entry.location.name}</span>
                               </div>
                             )}
                             <div>
@@ -1321,7 +1309,7 @@ export default function Dashboard() {
               <div className="bg-[#101116] border border-[#1B1C22] p-4 rounded-xl flex items-center justify-between gap-4">
                 <div className="space-y-0.5">
                   <div className="text-xs font-bold text-slate-200 flex items-center gap-2">
-                    <Database className="w-3.5 h-3.5 text-indigo-400" />
+                    <Database className="w-3.5 h-3.5 text-zinc-300" />
                     Firestore Cloud Database
                   </div>
                   <p className="text-[10px] text-slate-400">
@@ -1362,7 +1350,7 @@ export default function Dashboard() {
                     </span>
                     <button
                       onClick={handleGoogleConnect}
-                      className="text-[9px] font-bold text-indigo-400 hover:text-indigo-300 underline cursor-pointer"
+                      className="text-[9px] font-bold text-zinc-300 hover:text-white underline cursor-pointer"
                     >
                       Reconnect
                     </button>
@@ -1370,7 +1358,7 @@ export default function Dashboard() {
                 ) : (
                   <button
                     onClick={handleGoogleConnect}
-                    className="px-4 py-2 bg-[#18112C] border border-[#342466] text-[#9E8CF4] hover:bg-[#20173A] rounded-lg text-xs font-bold transition cursor-pointer"
+                    className="px-4 py-2 bg-zinc-800 border border-zinc-700 text-zinc-200 hover:bg-zinc-700 rounded-lg text-xs font-bold transition cursor-pointer"
                   >
                     Connect Google
                   </button>
@@ -1391,7 +1379,7 @@ export default function Dashboard() {
                       onChange={() => handleToggleSync('calendar')}
                       className="sr-only peer"
                     />
-                    <div className="w-9 h-5 bg-slate-800 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-slate-400 after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600 peer-checked:after:bg-white peer-checked:after:border-white"></div>
+                    <div className="w-9 h-5 bg-slate-800 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-slate-400 after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-200 peer-checked:after:bg-black peer-checked:after:border-black"></div>
                   </label>
                 </div>
 
@@ -1407,7 +1395,7 @@ export default function Dashboard() {
                       onChange={() => handleToggleSync('tasks')}
                       className="sr-only peer"
                     />
-                    <div className="w-9 h-5 bg-slate-800 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-slate-400 after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600 peer-checked:after:bg-white peer-checked:after:border-white"></div>
+                    <div className="w-9 h-5 bg-slate-800 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-slate-400 after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-200 peer-checked:after:bg-black peer-checked:after:border-black"></div>
                   </label>
                 </div>
 
@@ -1423,7 +1411,7 @@ export default function Dashboard() {
                       onChange={() => handleToggleSync('promptOnSave')}
                       className="sr-only peer"
                     />
-                    <div className="w-9 h-5 bg-slate-800 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-slate-400 after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600 peer-checked:after:bg-white peer-checked:after:border-white"></div>
+                    <div className="w-9 h-5 bg-slate-800 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-slate-400 after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-zinc-200 peer-checked:after:bg-black peer-checked:after:border-black"></div>
                   </label>
                 </div>
               </div>
@@ -1438,14 +1426,14 @@ export default function Dashboard() {
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <div className="text-sm font-bold text-slate-100 flex items-center gap-2">
-                      <Download className="w-4 h-4 text-indigo-400" />
+                      <Download className="w-4 h-4 text-zinc-300" />
                       Local Backup & Data Portability
                     </div>
                     <p className="text-xs text-slate-400 mt-1">
                       Download your full journal history to your local computer in formatted PDF or tabular CSV format. Complete privacy with zero cloud lock-in.
                     </p>
                   </div>
-                  <span className="text-[10px] font-mono font-bold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2 py-0.5 rounded uppercase shrink-0">
+                  <span className="text-[10px] font-mono font-bold bg-zinc-800 text-zinc-300 border border-zinc-700 px-2 py-0.5 rounded uppercase shrink-0">
                     {entries.length} Logs
                   </span>
                 </div>
@@ -1455,16 +1443,16 @@ export default function Dashboard() {
                     type="button"
                     onClick={() => exportEntriesToPdf(entries)}
                     disabled={entries.length === 0}
-                    className="flex items-center justify-between p-3.5 bg-[#15171C] hover:bg-[#1B1E24] border border-[#20222A] hover:border-indigo-500/40 rounded-xl text-left transition active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none cursor-pointer group"
+                    className="flex items-center justify-between p-3.5 bg-[#15171C] hover:bg-[#1B1E24] border border-[#20222A] hover:border-zinc-500 rounded-xl text-left transition active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none cursor-pointer group"
                   >
                     <div className="space-y-0.5">
                       <div className="text-xs font-bold text-white flex items-center gap-1.5">
-                        <FileText className="w-3.5 h-3.5 text-indigo-400" />
+                        <FileText className="w-3.5 h-3.5 text-zinc-300" />
                         Export All to PDF
                       </div>
                       <p className="text-[10px] text-slate-400">Formatted document with mood tags, AI summaries, & reflections</p>
                     </div>
-                    <Download className="w-4 h-4 text-slate-500 group-hover:text-indigo-400 transition shrink-0 ml-2" />
+                    <Download className="w-4 h-4 text-slate-500 group-hover:text-white transition shrink-0 ml-2" />
                   </button>
 
                   <button
@@ -1490,7 +1478,7 @@ export default function Dashboard() {
                 <div className="flex items-start justify-between gap-4">
                   <div>
                     <div className="text-sm font-bold text-slate-100 flex items-center gap-2">
-                      <Sparkles className="w-4 h-4 text-indigo-400" />
+                      <Sparkles className="w-4 h-4 text-zinc-300" />
                       Guided Reflection Prompt
                     </div>
                     <p className="text-xs text-slate-400 mt-1">
@@ -1501,17 +1489,17 @@ export default function Dashboard() {
                     type="button"
                     onClick={handleGeneratePromptFromSettings}
                     disabled={isGeneratingPrompt}
-                    className="inline-flex items-center gap-2 text-xs font-bold tracking-wider text-[#9E8CF4] bg-[#18112C] hover:bg-[#20173A] border border-[#342466] rounded-xl px-4 py-2.5 transition active:scale-95 disabled:opacity-40 select-none cursor-pointer shrink-0"
+                    className="inline-flex items-center gap-2 text-xs font-bold tracking-wider text-zinc-100 bg-zinc-800 hover:bg-zinc-700 border border-zinc-600 rounded-xl px-4 py-2.5 transition active:scale-95 disabled:opacity-40 select-none cursor-pointer shrink-0"
                   >
-                    <Sparkles className={`w-3.5 h-3.5 text-indigo-400 ${isGeneratingPrompt ? 'animate-spin' : ''}`} />
+                    <Sparkles className={`w-3.5 h-3.5 text-zinc-300 ${isGeneratingPrompt ? 'animate-spin' : ''}`} />
                     <span>{isGeneratingPrompt ? 'Generating...' : 'Generate Prompt'}</span>
                   </button>
                 </div>
 
                 {settingsPrompt && (
-                  <div className="bg-[#15171C] border border-indigo-500/20 p-4 rounded-xl space-y-3 animate-fade-in text-left">
+                  <div className="bg-[#15171C] border border-zinc-700 p-4 rounded-xl space-y-3 animate-fade-in text-left">
                     <div className="flex items-center justify-between">
-                      <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider">
+                      <span className="text-[10px] font-bold text-zinc-300 uppercase tracking-wider">
                         Tailored Reflection Idea
                       </span>
                       <button
@@ -1549,7 +1537,7 @@ export default function Dashboard() {
                       <button
                         type="button"
                         onClick={() => setActiveTab('chamber')}
-                        className="text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-500 px-3.5 py-1.5 rounded-lg transition active:scale-95 cursor-pointer inline-flex items-center gap-1.5"
+                        className="text-xs font-bold text-black bg-zinc-100 hover:bg-white px-3.5 py-1.5 rounded-lg transition active:scale-95 cursor-pointer inline-flex items-center gap-1.5 shadow-md shadow-black/30"
                       >
                         <span>Start Writing in Chamber</span>
                         <ChevronRight className="w-3.5 h-3.5" />
@@ -1583,14 +1571,14 @@ export default function Dashboard() {
           onClick={() => setIsChatOpen(!isChatOpen)}
           className={`w-14 h-14 rounded-full flex items-center justify-center shadow-2xl border transition-all duration-300 transform active:scale-95 cursor-pointer ${
             isChatOpen 
-              ? 'bg-indigo-600 border-indigo-500 text-white rotate-90 scale-105' 
-              : 'bg-[#15171C] border-[#1F2229] hover:border-slate-600 text-indigo-400 hover:text-indigo-300'
+              ? 'bg-zinc-100 border-white text-black rotate-90 scale-105' 
+              : 'bg-[#15171C] border-[#1F2229] hover:border-slate-600 text-zinc-300 hover:text-white'
           }`}
           title="Open Conversational Sounding Board"
         >
           <MessageCircle className="w-6 h-6 shrink-0" />
           {!isChatOpen && (
-            <span className="absolute top-0 right-0 w-3 h-3 bg-indigo-500 rounded-full border-2 border-[#07080C] animate-pulse" />
+            <span className="absolute top-0 right-0 w-3 h-3 bg-zinc-400 rounded-full border-2 border-[#07080C] animate-pulse" />
           )}
         </button>
       </div>
@@ -1664,7 +1652,7 @@ export default function Dashboard() {
                               checked={task.syncCalendar}
                               disabled={!syncSettings.calendarEnabled}
                               onChange={() => handleToggleTaskSyncOption(task.id, 'calendar')}
-                              className="rounded border-[#1B1C22] text-indigo-500 bg-[#08080A] focus:ring-0"
+                              className="rounded border-[#1B1C22] text-zinc-200 bg-[#08080A] focus:ring-0"
                             />
                             <span className="text-[10px] font-bold text-slate-400">Google Calendar Event</span>
                           </label>
@@ -1686,7 +1674,7 @@ export default function Dashboard() {
                               checked={task.syncTasks}
                               disabled={!syncSettings.tasksEnabled}
                               onChange={() => handleToggleTaskSyncOption(task.id, 'tasks')}
-                              className="rounded border-[#1B1C22] text-indigo-500 bg-[#08080A] focus:ring-0"
+                              className="rounded border-[#1B1C22] text-zinc-200 bg-[#08080A] focus:ring-0"
                             />
                             <span className="text-[10px] font-bold text-slate-400">Google Task Item</span>
                           </label>
@@ -1739,11 +1727,11 @@ export default function Dashboard() {
                     <button
                       onClick={handlePushToWorkspace}
                       disabled={isSyncingInProgress}
-                      className="px-5 py-2 bg-[#18112C] border border-[#342466] text-[#9E8CF4] hover:bg-[#20173A] rounded-full text-xs font-bold transition cursor-pointer flex items-center gap-1.5"
+                      className="px-5 py-2 bg-zinc-800 border border-zinc-700 text-zinc-100 hover:bg-zinc-700 rounded-full text-xs font-bold transition cursor-pointer flex items-center gap-1.5"
                     >
                       {isSyncingInProgress ? (
                         <>
-                          <span className="w-3 h-3 border border-indigo-400 border-t-transparent rounded-full animate-spin"></span>
+                          <span className="w-3 h-3 border border-zinc-300 border-t-transparent rounded-full animate-spin"></span>
                           <span>Syncing...</span>
                         </>
                       ) : (
@@ -1787,7 +1775,7 @@ export default function Dashboard() {
                     setActiveTab('settings');
                   }
                 }}
-                className="text-[10px] font-bold text-indigo-400 hover:text-indigo-300 cursor-pointer"
+                className="text-[10px] font-bold text-zinc-300 hover:text-white cursor-pointer"
               >
                 Try Again
               </button>
@@ -1804,11 +1792,11 @@ export default function Dashboard() {
 
       {/* Floating App Notice Toast */}
       {noticeMessage && (
-        <div className="fixed bottom-6 left-6 z-[100] max-w-sm w-full bg-[#0B0C0F] border border-indigo-500/20 shadow-2xl rounded-xl p-4 animate-fade-in flex items-start gap-3">
+        <div className="fixed bottom-6 left-6 z-[100] max-w-sm w-full bg-[#0B0C0F] border border-zinc-700 shadow-2xl rounded-xl p-4 animate-fade-in flex items-start gap-3">
           <div className={`p-2 rounded-lg shrink-0 mt-0.5 ${
             noticeMessage.type === 'error' ? 'bg-rose-500/10 text-rose-400' :
             noticeMessage.type === 'success' ? 'bg-emerald-500/10 text-emerald-400' :
-            'bg-indigo-500/10 text-indigo-400'
+            'bg-zinc-800 text-zinc-300'
           }`}>
             <Sparkles className="w-4 h-4" />
           </div>
@@ -1875,7 +1863,7 @@ export default function Dashboard() {
           >
             <div className="flex items-center justify-between pb-2.5 px-2 border-b border-[#1F2229]">
               <span className="text-xs font-semibold text-slate-200 flex items-center gap-1.5">
-                <ImageIcon className="w-4 h-4 text-indigo-400" />
+                <ImageIcon className="w-4 h-4 text-zinc-300" />
                 Archived Reflection Page
               </span>
               <button
@@ -1939,7 +1927,7 @@ export default function Dashboard() {
                   setLocalDownloadModalOpen(false);
                   setActiveTab('settings');
                 }}
-                className="w-full sm:w-auto px-4 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition active:scale-95 cursor-pointer shadow-lg shadow-indigo-600/20 text-center"
+                className="w-full sm:w-auto px-4 py-2.5 bg-zinc-100 hover:bg-white text-black rounded-xl text-xs font-bold transition active:scale-95 cursor-pointer shadow-lg shadow-black/40 text-center"
               >
                 Open Model Manager ({LOCAL_MODELS[selectedLocalModel].size})
               </button>

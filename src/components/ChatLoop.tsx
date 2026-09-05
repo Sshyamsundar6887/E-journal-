@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect, FormEvent } from 'react';
+  import { useState, useRef, useEffect, FormEvent } from 'react';
 import { ChatMessage } from '../types';
 import { Send, Sparkles, MessageCircle, AlertCircle, X } from 'lucide-react';
 
@@ -15,7 +15,7 @@ export default function ChatLoop({
   onSendMessage,
   onClose,
   appMode = 'cloud',
-  selectedModelName = 'Llama 3 8B',
+  selectedModelName = 'DistilBERT Sentiment',
 }: ChatLoopProps) {
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
@@ -59,13 +59,13 @@ export default function ChatLoop({
       <div className="shrink-0 mb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className={`w-1.5 h-1.5 rounded-full ${appMode === 'local' ? 'bg-emerald-400' : 'bg-[#8170D4]'} animate-pulse`}></span>
+            <span className={`w-1.5 h-1.5 rounded-full ${appMode === 'local' ? 'bg-emerald-400' : 'bg-zinc-400'} animate-pulse`}></span>
             <h3 className="font-serif italic text-sm font-normal text-slate-100 tracking-wide select-none">AI Sounding Board</h3>
             <span
               className={`text-[9px] font-mono font-bold px-1.5 py-0.5 rounded tracking-wider uppercase ${
                 appMode === 'local'
                   ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                  : 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20'
+                  : 'bg-zinc-800 text-zinc-300 border border-zinc-700'
               }`}
             >
               {appMode === 'local' ? `Local: ${selectedModelName}` : 'Cloud: Gemini'}
@@ -164,12 +164,12 @@ export default function ChatLoop({
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           disabled={loading}
-          className="w-full text-xs border border-[#1B1C22] rounded-full pl-4 pr-11 py-3 bg-[#0F1014] text-[#8E929E] placeholder-[#555866] focus:outline-none focus:border-indigo-500/20 transition disabled:opacity-65"
+          className="w-full text-xs border border-[#1B1C22] rounded-full pl-4 pr-11 py-3 bg-[#0F1014] text-[#8E929E] placeholder-[#555866] focus:outline-none focus:border-zinc-500 transition disabled:opacity-65"
         />
         <button
           type="submit"
           disabled={loading || !query.trim()}
-          className="absolute right-1.5 p-2 rounded-full text-indigo-400 hover:text-[#9E8CF4] transition cursor-pointer disabled:opacity-30"
+          className="absolute right-1.5 p-2 rounded-full text-zinc-300 hover:text-white transition cursor-pointer disabled:opacity-30"
         >
           <Send className="w-3.5 h-3.5" />
         </button>

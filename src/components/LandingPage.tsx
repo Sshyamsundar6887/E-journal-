@@ -1,5 +1,5 @@
 import { auth, googleProvider, signInWithPopup } from '../lib/firebase';
-import { BookOpen, ShieldCheck, Heart, Sparkles, MessageCircle, Cpu } from 'lucide-react';
+import { BookOpen, Heart, Sparkles, MessageCircle, Cpu } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useState } from 'react';
 
@@ -42,15 +42,15 @@ export default function LandingPage({ onAuthSuccess }: LandingPageProps) {
   };
 
   return (
-    <div id="landing-page" className="min-h-screen bg-[#0D0E12] text-[#E2E8F0] flex flex-col justify-between selection:bg-indigo-500/30 font-sans">
+    <div id="landing-page" className="min-h-screen bg-[#0A0B0E] text-[#E2E8F0] flex flex-col justify-between selection:bg-zinc-800 font-sans">
       {/* Top Header */}
-      <header className="h-14 border-b border-[#1F2229] flex items-center justify-between px-6 bg-[#0F1115] shrink-0">
+      <header className="h-14 border-b border-[#1A1C22] flex items-center justify-between px-6 bg-[#0E0F14] shrink-0">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
-            <BookOpen className="w-4.5 h-4.5 text-white" />
+          <div className="w-8 h-8 bg-zinc-800 border border-zinc-700 rounded-lg flex items-center justify-center text-zinc-100">
+            <BookOpen className="w-4 h-4 text-white" />
           </div>
           <h1 className="font-bold text-base tracking-tight text-white">
-            Aura <span className="text-indigo-400 font-normal">Journal</span>
+            Echo <span className="text-zinc-400 font-normal">Mind</span>
           </h1>
         </div>
         <div className="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
@@ -67,18 +67,18 @@ export default function LandingPage({ onAuthSuccess }: LandingPageProps) {
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="space-y-6 max-w-2xl"
         >
-          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-500/10 border border-indigo-500/20 rounded-full text-xs font-semibold text-indigo-300">
-            <Sparkles className="w-3.5 h-3.5 text-indigo-400 animate-pulse" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-900 border border-zinc-800 rounded-full text-xs font-semibold text-zinc-300">
+            <Sparkles className="w-3.5 h-3.5 text-zinc-400 animate-pulse" />
             <span>AI-Guided Multimodal Sounding Board</span>
           </div>
 
           <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-white leading-[1.15]">
             A sacred space for your thoughts, <br className="hidden sm:inline" />
-            remembered with <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400">semantic clarity</span>.
+            remembered with <span className="text-white underline decoration-zinc-600 underline-offset-8">semantic clarity</span>.
           </h1>
 
-          <p className="text-slate-400 text-base max-w-xl mx-auto font-sans leading-relaxed">
-            A secure, user-isolated journaling experience. Log in to choose between fast Cloud Gemini inference or 100% on-device local models with local IndexedDB storage.
+          <p className="text-zinc-400 text-base max-w-xl mx-auto font-sans leading-relaxed">
+            A secure, user-isolated journaling experience. Log in to choose between fast Cloud Gemini inference or 100% on-device micro models with local IndexedDB storage.
           </p>
 
           <div className="pt-4 space-y-3">
@@ -86,10 +86,10 @@ export default function LandingPage({ onAuthSuccess }: LandingPageProps) {
               id="google-signin-btn"
               onClick={handleSignIn}
               disabled={loading}
-              className="inline-flex items-center justify-center gap-3 bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-3 rounded-lg text-sm font-semibold transition-all shadow-lg shadow-indigo-500/20 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
+              className="inline-flex items-center justify-center gap-3 bg-zinc-100 hover:bg-white text-black px-8 py-3 rounded-xl text-sm font-semibold transition-all shadow-lg shadow-black/40 disabled:opacity-60 disabled:cursor-not-allowed cursor-pointer"
             >
               {loading ? (
-                <div className="w-5 h-5 border-2 border-slate-400 border-t-white rounded-full animate-spin"></div>
+                <div className="w-5 h-5 border-2 border-zinc-400 border-t-black rounded-full animate-spin"></div>
               ) : (
                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
@@ -110,33 +110,33 @@ export default function LandingPage({ onAuthSuccess }: LandingPageProps) {
         </motion.div>
 
         {/* Features Minimal Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl mt-16 border-t border-[#1F2229] pt-12 text-left">
-          <div className="bg-[#0F1115] border border-[#1F2229] p-5 rounded-xl space-y-3">
-            <div className="w-8 h-8 bg-indigo-500/10 border border-indigo-500/20 rounded-lg flex items-center justify-center text-indigo-400">
-              <Cpu className="w-4.5 h-4.5" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-4xl mt-16 border-t border-[#1A1C22] pt-12 text-left">
+          <div className="bg-[#0E0F14] border border-[#1A1C22] p-5 rounded-xl space-y-3">
+            <div className="w-8 h-8 bg-zinc-900 border border-zinc-800 rounded-lg flex items-center justify-center text-zinc-300">
+              <Cpu className="w-4 h-4" />
             </div>
             <h3 className="font-bold text-white text-sm">Cloud or Full-Local Inference</h3>
-            <p className="text-slate-400 text-xs leading-relaxed">
-              Default to fast encrypted Gemini cloud API, or switch to Full-Local mode with on-device models (Llama 3 8B or Gemma 2 2B) and private IndexedDB storage.
+            <p className="text-zinc-400 text-xs leading-relaxed">
+              Default to fast encrypted Gemini cloud API, or switch to Full-Local mode with on-device micro models (DistilBERT SST-2 or all-MiniLM-L6-v2) and private IndexedDB storage.
             </p>
           </div>
 
-          <div className="bg-[#0F1115] border border-[#1F2229] p-5 rounded-xl space-y-3">
-            <div className="w-8 h-8 bg-indigo-500/10 border border-indigo-500/20 rounded-lg flex items-center justify-center text-indigo-400">
-              <MessageCircle className="w-4.5 h-4.5" />
+          <div className="bg-[#0E0F14] border border-[#1A1C22] p-5 rounded-xl space-y-3">
+            <div className="w-8 h-8 bg-zinc-900 border border-zinc-800 rounded-lg flex items-center justify-center text-zinc-300">
+              <MessageCircle className="w-4 h-4" />
             </div>
             <h3 className="font-bold text-white text-sm">Conversational RAG Memory</h3>
-            <p className="text-slate-400 text-xs leading-relaxed">
-              Query your previous entries using direct semantic meaning. No exact keyword tags needed. Aura remembers your patterns, growth steps, and breakthroughs.
+            <p className="text-zinc-400 text-xs leading-relaxed">
+              Query your previous entries using direct semantic meaning. No exact keyword tags needed. Echo Mind remembers your patterns, growth steps, and breakthroughs.
             </p>
           </div>
 
-          <div className="bg-[#0F1115] border border-[#1F2229] p-5 rounded-xl space-y-3">
-            <div className="w-8 h-8 bg-indigo-500/10 border border-indigo-500/20 rounded-lg flex items-center justify-center text-indigo-400">
-              <Heart className="w-4.5 h-4.5" />
+          <div className="bg-[#0E0F14] border border-[#1A1C22] p-5 rounded-xl space-y-3">
+            <div className="w-8 h-8 bg-zinc-900 border border-zinc-800 rounded-lg flex items-center justify-center text-zinc-300">
+              <Heart className="w-4 h-4" />
             </div>
             <h3 className="font-bold text-white text-sm">Emotional Insights & Goals</h3>
-            <p className="text-slate-400 text-xs leading-relaxed">
+            <p className="text-zinc-400 text-xs leading-relaxed">
               Every reflection automatically generates mood classifications, extracted action goals, and wellbeing trend mapping across both cloud and local modes.
             </p>
           </div>
@@ -144,8 +144,8 @@ export default function LandingPage({ onAuthSuccess }: LandingPageProps) {
       </main>
 
       {/* Footer */}
-      <footer className="w-full text-center py-6 border-t border-[#1F2229] text-[10px] text-slate-500 font-mono bg-[#0F1115]">
-        <p>&copy; 2026 Aura Journal. Securely containerized and authenticated.</p>
+      <footer className="w-full text-center py-6 border-t border-[#1A1C22] text-[10px] text-zinc-500 font-mono bg-[#0E0F14]">
+        <p>&copy; 2026 Echo Mind. Securely containerized and authenticated.</p>
       </footer>
     </div>
   );
