@@ -7,6 +7,7 @@ export const WORKSPACE_SCOPES = [
 ];
 
 let cachedAccessToken: string | null = null;
+let cachedAccessTokenUserId: string | null = null;
 let isSigningIn = false;
 
 /**
@@ -33,6 +34,7 @@ export const googleWorkspaceSignIn = async (): Promise<{ user: User; accessToken
     }
 
     cachedAccessToken = credential.accessToken;
+    cachedAccessTokenUserId = result.user.uid;
     return { user: result.user, accessToken: cachedAccessToken };
   } catch (err: any) {
     const isUserCancellation = err?.code === 'auth/popup-closed-by-user' || 
@@ -54,14 +56,19 @@ export const googleWorkspaceSignIn = async (): Promise<{ user: User; accessToken
  * Gets the current cached Google Workspace access token.
  */
 export const getCachedAccessToken = (): string | null => {
+  // Never return a token unless it belongs to the currently authenticated Firebase user.
+  if (!auth.currentUser || cachedAccessTokenUserId !== auth.currentUser.uid) {
+    return null;
+  }
   return cachedAccessToken;
 };
 
 /**
  * Sets the cached Google Workspace access token.
  */
-export const setCachedAccessToken = (token: string | null) => {
+export const setCachedAccessToken = (token: string | null, userId?: string) => {
   cachedAccessToken = token;
+  cachedAccessTokenUserId = token ? (userId ?? auth.currentUser?.uid ?? null) : null;
 };
 
 /**
@@ -69,6 +76,7 @@ export const setCachedAccessToken = (token: string | null) => {
  */
 export const clearCachedAccessToken = () => {
   cachedAccessToken = null;
+  cachedAccessTokenUserId = null;
 };
 
 /**

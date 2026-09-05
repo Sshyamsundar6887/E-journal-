@@ -12,6 +12,7 @@ import LocalModelManager from './LocalModelManager';
 import { exportEntriesToCsv, exportEntriesToPdf } from '../utils/exportUtils';
 import {
   getCachedAccessToken,
+  clearCachedAccessToken,
   googleWorkspaceSignIn,
   createCalendarEvent,
   createGoogleTask
@@ -83,6 +84,11 @@ export default function Dashboard() {
   const [promptCopied, setPromptCopied] = useState(false);
 
   const currentUser = auth.currentUser;
+
+  // Prevent a Workspace token from surviving logout or a Firebase user switch.
+  useEffect(() => {
+    clearCachedAccessToken();
+  }, [currentUser?.uid]);
 
   // Real-time listener for Journal Entries (Firestore for Cloud Mode, IndexedDB for Local Mode)
   useEffect(() => {
@@ -378,8 +384,9 @@ export default function Dashboard() {
   };
 
   // Handle Google Log Out
-  const handleSignOut = () => {
-    auth.signOut();
+  const handleSignOut = async () => {
+    clearCachedAccessToken();
+    await auth.signOut();
   };
 
   // Secure Save Journal Entry
@@ -1045,8 +1052,8 @@ export default function Dashboard() {
                       setSyncDialogTasks(allActionItems.map(item => ({
                         id: item.id,
                         text: item.text,
-                        syncCalendar: syncSettings.calendarEnabled || true,
-                        syncTasks: syncSettings.tasksEnabled || true,
+                        syncCalendar: syncSettings.calendarEnabled,
+                        syncTasks: syncSettings.tasksEnabled,
                         calendarTime: getTomorrowDateTimeString(),
                         tasksDueDate: getTomorrowDateString()
                       })));
