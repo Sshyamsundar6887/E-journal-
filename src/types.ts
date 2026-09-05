@@ -15,6 +15,7 @@ export interface JournalEntry {
   summary: string;
   actionItems: ActionItem[];
   imageUrl?: string;
+  location?: EntryLocation;
   embedding?: number[];
   audioTranscript?: string;
   createdAt: number;
@@ -54,14 +55,14 @@ export interface InsightsSummary {
 
 export type AppMode = 'cloud' | 'local';
 
-export type LocalModelId = 'llama-3-8b' | 'gemma-2-2b';
+export type LocalModelId = 'distilbert-sentiment' | 'minilm-embeddings';
 
 export interface LocalModelMeta {
   id: LocalModelId;
   name: string;
   tagline: string;
   parameters: string;
-  size: string; // e.g., "4.7 GB" or "1.6 GB"
+  size: string; // e.g., "25.5 MB" or "23.1 MB"
   sizeBytes: number;
   quantization: string;
   ramRequired: string;

@@ -1,5 +1,5 @@
 {
-  "name": "Remix Aura Journal",
+  "name": "Remix Echo Mind",
   "description": "A secure, user-authenticated personal journaling application integrated with Gemini RAG semantic memory, voice speech-to-text venting, vision processing, and automated wellbeing trend mapping.",
   "requestFramePermissions": [
     "microphone"

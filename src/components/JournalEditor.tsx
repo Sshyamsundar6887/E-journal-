@@ -1,9 +1,11 @@
 import { useState, useRef, useEffect, ChangeEvent, FormEvent } from 'react';
-import { Mic, MicOff, Image as ImageIcon, CheckCircle, AlertCircle, X, Send } from 'lucide-react';
+import { Mic, MicOff, Image as ImageIcon, CheckCircle, AlertCircle, X, Send, MapPin } from 'lucide-react';
+import LocationPicker from './LocationPicker';
+import { EntryLocation } from '../types';
 
 interface JournalEditorProps {
   recentEntries?: any[];
-  onSaveEntry: (title: string, content: string, imageBase64: string | null) => Promise<any>;
+  onSaveEntry: (title: string, content: string, imageBase64: string | null, location?: EntryLocation | null) => Promise<any>;
   appMode?: 'cloud' | 'local';
   selectedModelName?: string;
 }
@@ -17,6 +19,8 @@ export default function JournalEditor({
   const [content, setContent] = useState("");
   const [imageBase64, setImageBase64] = useState<string | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [location, setLocation] = useState<EntryLocation | null>(null);
+  const [showLocationPicker, setShowLocationPicker] = useState(false);
 
   // Audio recording state
   const [isRecording, setIsRecording] = useState(false);
@@ -151,13 +155,15 @@ export default function JournalEditor({
 
     try {
       const defaultTitle = title.trim() || `Reflection on ${new Date().toLocaleDateString()}`;
-      await onSaveEntry(defaultTitle, content, imageBase64);
+      await onSaveEntry(defaultTitle, content, imageBase64, location);
       
       // Zero-Crash Input state clearance: ONLY clear when database write is fully confirmed!
       setTitle("");
       setContent("");
       setImageBase64(null);
       setImagePreview(null);
+      setLocation(null);
+      setShowLocationPicker(false);
       setSaveSuccess(true);
       setTimeout(() => setSaveSuccess(false), 4000);
     } catch (err: any) {
@@ -232,6 +238,36 @@ export default function JournalEditor({
             </div>
           )}
 
+          {/* Location Badge */}
+          {location && !showLocationPicker && (
+            <div className="relative inline-flex items-center gap-2 self-start mt-2 mb-3 border border-zinc-800 rounded-xl px-3 py-1.5 bg-zinc-900/90 shrink-0 animate-fade-in text-xs">
+              <MapPin className="w-3.5 h-3.5 text-zinc-300 shrink-0" />
+              <span className="text-zinc-200 font-medium truncate max-w-[280px]">{location.name}</span>
+              <button
+                type="button"
+                onClick={() => setLocation(null)}
+                className="text-zinc-500 hover:text-rose-400 transition p-0.5 cursor-pointer"
+                title="Remove location"
+              >
+                <X className="w-3 h-3" />
+              </button>
+            </div>
+          )}
+
+          {/* Location Picker Inline Panel */}
+          {showLocationPicker && (
+            <div className="mb-4">
+              <LocationPicker
+                location={location}
+                onChange={(loc) => {
+                  setLocation(loc);
+                  if (loc) setShowLocationPicker(false);
+                }}
+                onClose={() => setShowLocationPicker(false)}
+              />
+            </div>
+          )}
+
           {/* Inline bottom bar inside the exact writing frame box */}
           <div className="flex items-center justify-between border-t border-[#15161C] pt-4 mt-auto">
             <div className="flex items-center gap-2.5">
@@ -261,6 +297,21 @@ export default function JournalEditor({
                   className="hidden"
                 />
               </label>
+
+              {/* Location Tag Icon Button */}
+              <button
+                type="button"
+                onClick={() => setShowLocationPicker(prev => !prev)}
+                disabled={isSaving}
+                className={`w-9 h-9 rounded-full flex items-center justify-center transition active:scale-90 border ${
+                  location || showLocationPicker
+                    ? 'bg-zinc-800 text-zinc-100 border-zinc-600'
+                    : 'bg-[#141418] hover:bg-[#1C1C22] border-[#202129] text-slate-400 hover:text-slate-200'
+                }`}
+                title={location ? `Location: ${location.name}` : "Attach GPS location"}
+              >
+                <MapPin className="w-4 h-4" />
+              </button>
             </div>
 
             {/* Save Button inside the bottom-right of the writing frame */}

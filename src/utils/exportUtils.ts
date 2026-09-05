@@ -49,6 +49,7 @@ export function exportEntriesToCsv(
     'AI Summary',
     'Action Items',
     'Has Photo Attachment',
+    'Location',
     'Reflection Content'
   ];
 
@@ -71,6 +72,7 @@ export function exportEntriesToCsv(
       sanitizeCsvCell(entry.summary || ''),
       sanitizeCsvCell(actionItemsFormatted),
       sanitizeCsvCell(entry.imageUrl ? 'Yes' : 'No'),
+      sanitizeCsvCell(entry.location ? entry.location.name : ''),
       sanitizeCsvCell(entry.content || '')
     ].join(',');
   });
@@ -124,14 +126,14 @@ export function exportEntriesToPdf(
     return false;
   };
 
-  // Header - Aura Journal Branding
+  // Header - Echo Mind Branding
   doc.setFillColor(15, 17, 21); // #0F1115
   doc.rect(0, 0, pageWidth, 28, 'F');
 
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(16);
   doc.setFont('helvetica', 'bold');
-  doc.text('AURA JOURNAL', margin, 14);
+  doc.text('ECHO MIND', margin, 14);
 
   doc.setFontSize(9);
   doc.setFont('helvetica', 'normal');
@@ -189,8 +191,9 @@ export function exportEntriesToPdf(
 
     const moodTag = `Mood: ${entry.mood || 'Reflective'}`;
     const sentimentTag = `Sentiment: ${entry.sentiment || 'neutral'} (${entry.sentimentScore !== undefined ? entry.sentimentScore.toFixed(2) : '0.00'})`;
+    const locationTag = entry.location ? `Location: ${entry.location.name}` : '';
     const themesTag = entry.themes && entry.themes.length > 0 ? `Themes: ${entry.themes.join(', ')}` : '';
-    const badgeText = [moodTag, sentimentTag, themesTag].filter(Boolean).join('  |  ');
+    const badgeText = [moodTag, sentimentTag, locationTag, themesTag].filter(Boolean).join('  |  ');
     doc.text(badgeText, margin, cursorY);
     cursorY += 6;
 
@@ -273,7 +276,7 @@ export function exportEntriesToPdf(
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(150, 155, 170);
     doc.text(
-      `Page ${i} of ${totalPages}  •  Aura Journal Local Backup`,
+      `Page ${i} of ${totalPages}  •  Echo Mind Local Backup`,
       pageWidth / 2,
       pageHeight - 8,
       { align: 'center' }

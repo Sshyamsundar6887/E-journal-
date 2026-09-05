@@ -1,4 +1,4 @@
-# Aura Journal & Sounding Board
+# Echo Mind & Sounding Board
 
 A secure, user-isolated journaling web application integrated with Gemini RAG semantic memory, voice speech-to-text venting, vision processing, and automated wellbeing trend mapping.
 
@@ -37,7 +37,7 @@ service cloud.firestore {
 
 ## 3. Secret Management Setup
 
-The Aura Journal server keeps critical credentials completely out of source code by retrieving them dynamically from **Google Cloud Secret Manager**.
+The Echo Mind server keeps critical credentials completely out of source code by retrieving them dynamically from **Google Cloud Secret Manager**.
 
 Run the following commands to create and populate the secret, then grant permissions to your Cloud Run computing service account:
 

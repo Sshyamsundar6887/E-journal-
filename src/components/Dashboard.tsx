@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { auth, db, handleFirestoreError, OperationType } from '../lib/firebase';
-import { JournalEntry, ChatMessage, MoodTrendPoint, ActionItem, AppMode, LocalModelId } from '../types';
+import { JournalEntry, ChatMessage, MoodTrendPoint, ActionItem, AppMode, LocalModelId, EntryLocation } from '../types';
 import { collection, onSnapshot, query, orderBy, setDoc, doc, updateDoc, deleteDoc } from 'firebase/firestore';
-import { LogOut, User, Sparkles, BookOpen, Calendar, ChevronRight, Activity, Eye, Trash2, MessageCircle, Settings, X, Image as ImageIcon, ZoomIn, Download, FileText, Table, Copy, Check, Database, Cloud, Cpu, Shield, HardDrive } from 'lucide-react';
+import { LogOut, User, Sparkles, BookOpen, Calendar, ChevronRight, Activity, Eye, Trash2, MessageCircle, Settings, X, Image as ImageIcon, ZoomIn, Download, FileText, Table, Copy, Check, Database, Cloud, Cpu, Shield, HardDrive, MapPin } from 'lucide-react';
 import JournalEditor from './JournalEditor';
 import MoodChart from './MoodChart';
 import ActionItems from './ActionItems';
@@ -339,7 +339,7 @@ export default function Dashboard() {
           
           await createCalendarEvent(token, {
             summary: task.text,
-            description: "Generated from your Aura Journal secure reflection.",
+            description: "Generated from your Echo Mind secure reflection.",
             startDateTime: start.toISOString(),
             endDateTime: end.toISOString()
           });
@@ -348,7 +348,7 @@ export default function Dashboard() {
         if (task.syncTasks) {
           await createGoogleTask(token, {
             title: task.text,
-            notes: "Created from Aura Journal",
+            notes: "Created from Echo Mind",
             dueDateTime: task.tasksDueDate
           });
         }
@@ -383,7 +383,12 @@ export default function Dashboard() {
   };
 
   // Secure Save Journal Entry
-  const handleSaveEntry = async (title: string, content: string, imageBase64: string | null) => {
+  const handleSaveEntry = async (
+    title: string,
+    content: string,
+    imageBase64: string | null,
+    location?: EntryLocation | null
+  ) => {
     // 1. FULL-LOCAL MODE: Execute on-device model and save to local IndexedDB
     if (appMode === 'local') {
       if (!isModelDownloaded(selectedLocalModel)) {
@@ -417,6 +422,7 @@ export default function Dashboard() {
         summary: analysis.summary || "",
         actionItems: actionItemsWithIds,
         imageUrl: imageBase64 || undefined,
+        location: location || undefined,
         embedding: analysis.embedding || [],
         createdAt: Date.now()
       };
@@ -500,6 +506,7 @@ export default function Dashboard() {
       summary: analysis.summary || "",
       actionItems: actionItemsWithIds,
       imageUrl: imageBase64 || undefined,
+      location: location || undefined,
       embedding: analysis.embedding || [],
       createdAt: Date.now()
     };
@@ -840,16 +847,8 @@ export default function Dashboard() {
             <BookOpen className="w-4 h-4 text-white stroke-[2.2]" />
           </div>
           <h1 className="text-lg font-bold tracking-tight flex items-baseline gap-1 leading-none select-none">
-            <span className="text-white flex items-baseline">
-              <span
-                className="relative inline-block font-extrabold"
-                style={{ textShadow: "-1.2px 0px 0px #00D2FF, 1.2px 0px 0px #FF9500" }}
-              >
-                A
-              </span>
-              <span className="font-bold">ura</span>
-            </span>
-            <span className="font-medium text-[#4F75FF]">Journal</span>
+            <span className="text-white font-bold">Echo</span>
+            <span className="font-medium text-slate-400">Mind</span>
           </h1>
         </div>
         <div className="flex items-center gap-3">
@@ -877,22 +876,14 @@ export default function Dashboard() {
       {/* COLUMN 1: LEFT SIDEBAR (Desktop only) */}
       <aside className="w-64 bg-[#050505] border-r border-[#121318] hidden md:flex flex-col justify-between p-6 shrink-0 h-screen select-none">
         <div>
-          {/* Logo Brand matching Aura Journal reference image */}
+          {/* Logo Brand matching Echo Mind reference image */}
           <div className="mb-10 flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#5D5FEF] via-[#7B61FF] to-[#A452F6] flex items-center justify-center shadow-lg shadow-indigo-500/20 shrink-0">
               <BookOpen className="w-5 h-5 text-white stroke-[2.2]" />
             </div>
             <h1 className="text-xl font-bold tracking-tight flex items-baseline gap-1.5 leading-none select-none">
-              <span className="text-white flex items-baseline">
-                <span
-                  className="relative inline-block font-extrabold"
-                  style={{ textShadow: "-1.5px 0px 0px #00D2FF, 1.5px 0px 0px #FF9500" }}
-                >
-                  A
-                </span>
-                <span className="font-bold">ura</span>
-              </span>
-              <span className="font-medium text-[#4F75FF]">Journal</span>
+              <span className="text-white font-bold">Echo</span>
+              <span className="font-medium text-slate-400">Mind</span>
             </h1>
           </div>
 
@@ -1182,6 +1173,11 @@ export default function Dashboard() {
                                   <ImageIcon className="w-2.5 h-2.5" /> Photo Saved
                                 </span>
                               )}
+                              {entry.location && (
+                                <span className="inline-flex items-center gap-1 text-[8px] font-medium text-slate-300 bg-slate-800/80 px-1.5 py-0.5 rounded border border-[#1F2229]">
+                                  <MapPin className="w-2.5 h-2.5 text-emerald-400" /> {entry.location.name}
+                                </span>
+                              )}
                             </div>
                             <h5 className="font-bold text-xs text-white truncate mt-1">{entry.title}</h5>
                           </div>
@@ -1283,6 +1279,12 @@ export default function Dashboard() {
                                     className="max-h-48 w-auto rounded object-contain cursor-pointer hover:opacity-95 transition"
                                   />
                                 </div>
+                              </div>
+                            )}
+                            {entry.location && (
+                              <div className="flex items-center gap-1.5 text-xs text-slate-300">
+                                <MapPin className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                                <span>{entry.location.name}</span>
                               </div>
                             )}
                             <div>

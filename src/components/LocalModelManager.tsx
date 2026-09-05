@@ -28,7 +28,6 @@ import {
   Download,
   CheckCircle,
   AlertCircle,
-  Database,
   Trash2,
   FileJson,
   X,
@@ -142,7 +141,7 @@ export default function LocalModelManager({
 
       setModels(getLocalModelsState());
       setFeedbackNotice(
-        `${models[targetModelId].name} downloaded successfully! Ready for local execution.`
+        `${models[targetModelId].name} downloaded successfully! Ready for real on-device execution.`
       );
       setTimeout(() => setFeedbackNotice(null), 4500);
     } catch (err: any) {
@@ -160,13 +159,13 @@ export default function LocalModelManager({
     setDownloadingModelId(null);
   };
 
-  const handleDeleteModel = (modelId: LocalModelId) => {
+  const handleDeleteModel = async (modelId: LocalModelId) => {
     if (
       confirm(
         `Are you sure you want to delete ${models[modelId].name} from local storage? You can re-download it anytime.`
       )
     ) {
-      deleteDownloadedModel(modelId);
+      await deleteDownloadedModel(modelId);
       setModels(getLocalModelsState());
     }
   };
@@ -177,7 +176,7 @@ export default function LocalModelManager({
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `AuraJournal_Local_Backup_${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = `EchoMind_Local_Backup_${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -194,28 +193,28 @@ export default function LocalModelManager({
     <div className="space-y-6 text-left">
       {/* Feedback Notice Banner */}
       {feedbackNotice && (
-        <div className="p-3.5 bg-indigo-500/10 border border-indigo-500/30 rounded-xl text-xs text-indigo-300 flex items-center gap-2 animate-fade-in">
-          <Sparkles className="w-4 h-4 text-indigo-400 shrink-0" />
+        <div className="p-3.5 bg-zinc-900 border border-zinc-700 rounded-xl text-xs text-zinc-200 flex items-center gap-2 animate-fade-in">
+          <Sparkles className="w-4 h-4 text-zinc-400 shrink-0" />
           <span>{feedbackNotice}</span>
         </div>
       )}
 
       {/* SECTION 1: Privacy & Inference Mode Switcher */}
-      <div className="bg-[#101116] border border-[#1B1C22] p-5 rounded-2xl space-y-4">
+      <div className="bg-[#101114] border border-[#1E2024] p-5 rounded-2xl space-y-4">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <div className="text-sm font-bold text-slate-100 flex items-center gap-2">
-              <Shield className="w-4 h-4 text-indigo-400" />
+            <div className="text-sm font-bold text-zinc-100 flex items-center gap-2">
+              <Shield className="w-4 h-4 text-zinc-400" />
               Inference & Data Architecture
             </div>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-zinc-400 mt-1">
               Choose between high-speed encrypted cloud pipelines or completely isolated on-device execution.
             </p>
           </div>
           <span
             className={`text-[9px] font-mono font-bold px-2.5 py-1 rounded uppercase tracking-wider ${
               appMode === 'cloud'
-                ? 'bg-indigo-500/10 text-indigo-400 border border-indigo-500/20'
+                ? 'bg-zinc-800 text-zinc-300 border border-zinc-700'
                 : 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
             }`}
           >
@@ -230,27 +229,27 @@ export default function LocalModelManager({
             onClick={() => handleSwitchMode('cloud')}
             className={`p-4 rounded-xl border transition cursor-pointer relative flex flex-col justify-between ${
               appMode === 'cloud'
-                ? 'bg-[#151722] border-indigo-500/50 shadow-lg shadow-indigo-500/5'
-                : 'bg-[#0E0F14] border-[#1B1C22] hover:border-slate-700 opacity-80'
+                ? 'bg-[#18191E] border-zinc-500 shadow-lg shadow-black/40'
+                : 'bg-[#0E0F12] border-[#1C1E22] hover:border-zinc-700 opacity-80'
             }`}
           >
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <Cloud className="w-4 h-4 text-indigo-400" />
+                  <Cloud className="w-4 h-4 text-zinc-300" />
                   <span className="text-xs font-bold text-white">Encrypted Cloud API</span>
                 </div>
-                <span className="text-[9px] font-bold uppercase tracking-wider bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 px-2 py-0.5 rounded">
+                <span className="text-[9px] font-bold uppercase tracking-wider bg-zinc-800 text-zinc-300 border border-zinc-700 px-2 py-0.5 rounded">
                   Default
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400 leading-relaxed">
+              <p className="text-[11px] text-zinc-400 leading-relaxed">
                 Instant onboarding with zero heavy downloads. Uses Google Gemini API with automated multi-model fallback ladder and Firestore cloud database.
               </p>
             </div>
-            <div className="pt-3 border-t border-[#1C1E26] mt-3 flex items-center justify-between text-[10px] text-slate-400">
+            <div className="pt-3 border-t border-[#1C1E22] mt-3 flex items-center justify-between text-[10px] text-zinc-400">
               <span>Zero disk storage needed</span>
-              <span className="text-indigo-400 font-semibold">{appMode === 'cloud' ? '● Active' : 'Select'}</span>
+              <span className="text-zinc-200 font-semibold">{appMode === 'cloud' ? '● Active' : 'Select'}</span>
             </div>
           </div>
 
@@ -260,7 +259,7 @@ export default function LocalModelManager({
             className={`p-4 rounded-xl border transition cursor-pointer relative flex flex-col justify-between ${
               appMode === 'local'
                 ? 'bg-[#121915] border-emerald-500/50 shadow-lg shadow-emerald-500/5'
-                : 'bg-[#0E0F14] border-[#1B1C22] hover:border-slate-700 opacity-80'
+                : 'bg-[#0E0F12] border-[#1C1E22] hover:border-zinc-700 opacity-80'
             }`}
           >
             <div className="space-y-2">
@@ -273,11 +272,11 @@ export default function LocalModelManager({
                   Private
                 </span>
               </div>
-              <p className="text-[11px] text-slate-400 leading-relaxed">
-                100% on-device private execution. Inference routes through local models (Llama 3 8B or Gemma 2 2B) and journals persist in local IndexedDB.
+              <p className="text-[11px] text-zinc-400 leading-relaxed">
+                100% on-device private execution. Inference routes through in-browser micro models (DistilBERT SST-2 or all-MiniLM-L6-v2) and journals persist in local IndexedDB.
               </p>
             </div>
-            <div className="pt-3 border-t border-[#1C1E26] mt-3 flex items-center justify-between text-[10px] text-slate-400">
+            <div className="pt-3 border-t border-[#1C1E22] mt-3 flex items-center justify-between text-[10px] text-zinc-400">
               <span>Zero cloud outbound traffic</span>
               <span className="text-emerald-400 font-semibold">{appMode === 'local' ? '● Active' : 'Select'}</span>
             </div>
@@ -285,16 +284,16 @@ export default function LocalModelManager({
         </div>
       </div>
 
-      {/* SECTION 2: Local Models Selection & Download Manager */}
-      <div className="bg-[#101116] border border-[#1B1C22] p-5 rounded-2xl space-y-4">
+      {/* SECTION 2: Local Micro Models Selection & Download Manager */}
+      <div className="bg-[#101114] border border-[#1E2024] p-5 rounded-2xl space-y-4">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <div className="text-sm font-bold text-slate-100 flex items-center gap-2">
-              <Layers className="w-4 h-4 text-indigo-400" />
-              Local Model Selection & Weights
+            <div className="text-sm font-bold text-zinc-100 flex items-center gap-2">
+              <Layers className="w-4 h-4 text-zinc-300" />
+              In-Browser Micro Models (WebAssembly sandbox)
             </div>
-            <p className="text-xs text-slate-400 mt-1">
-              Select between supported quantized on-device foundation models. Review stated model download sizes before saving to local cache.
+            <p className="text-xs text-zinc-400 mt-1">
+              Genuine ONNX neural models executed locally inside your browser's WebAssembly sandbox. Lightweight weights (~25 MB) downloaded directly to your browser cache.
             </p>
           </div>
           {appMode === 'local' && (
@@ -306,12 +305,12 @@ export default function LocalModelManager({
 
         {/* Downloading Live Banner */}
         {downloadingModelId && (
-          <div className="bg-[#151722] border border-indigo-500/30 p-4 rounded-xl space-y-3 animate-fade-in">
+          <div className="bg-[#16171C] border border-zinc-700 p-4 rounded-xl space-y-3 animate-fade-in">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-indigo-400 animate-ping"></span>
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
                 <span className="text-xs font-bold text-white">
-                  Downloading {models[downloadingModelId].name}...
+                  Streaming {models[downloadingModelId].name} into browser sandbox...
                 </span>
               </div>
               <button
@@ -326,12 +325,12 @@ export default function LocalModelManager({
             {/* Progress Bar */}
             <div className="w-full bg-[#08080A] rounded-full h-2 overflow-hidden border border-[#20222A]">
               <div
-                className="bg-gradient-to-r from-indigo-500 to-emerald-400 h-full transition-all duration-200"
+                className="bg-gradient-to-r from-zinc-400 to-emerald-400 h-full transition-all duration-200"
                 style={{ width: `${downloadProgress}%` }}
               />
             </div>
 
-            <div className="flex items-center justify-between text-[10px] font-mono text-slate-400">
+            <div className="flex items-center justify-between text-[10px] font-mono text-zinc-400">
               <span>
                 {downloadedMB} MB / {totalMB} MB ({downloadProgress}%)
               </span>
@@ -342,17 +341,17 @@ export default function LocalModelManager({
 
         {/* Model 1 & Model 2 Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
-          {/* Llama 3 8B */}
+          {/* Model 1: DistilBERT Sentiment */}
           {(() => {
-            const m = models['llama-3-8b'];
-            const isSelected = selectedModel === 'llama-3-8b';
+            const m = models['distilbert-sentiment'];
+            const isSelected = selectedModel === 'distilbert-sentiment';
             return (
               <div
                 key={m.id}
                 className={`p-4 rounded-xl border flex flex-col justify-between transition ${
                   isSelected
-                    ? 'bg-[#13151D] border-indigo-500/60 shadow-md shadow-indigo-500/5'
-                    : 'bg-[#0E0F14] border-[#1B1C22]'
+                    ? 'bg-[#16181D] border-zinc-400 shadow-md shadow-black/30'
+                    : 'bg-[#0E0F12] border-[#1E2024]'
                 }`}
               >
                 <div className="space-y-2.5">
@@ -360,10 +359,10 @@ export default function LocalModelManager({
                     <div>
                       <div className="text-xs font-bold text-white flex items-center gap-1.5">
                         <span>{m.name}</span>
-                        <span className="text-[10px] font-normal text-slate-400">({m.parameters})</span>
+                        <span className="text-[10px] font-normal text-zinc-400">({m.parameters})</span>
                       </div>
-                      <p className="text-[10px] text-indigo-400 font-mono mt-0.5">
-                        Download Size: <strong className="text-indigo-300 font-bold">{m.size}</strong> ({m.quantization})
+                      <p className="text-[10px] text-zinc-300 font-mono mt-0.5">
+                        Sandbox Weight: <strong className="text-white font-bold">{m.size}</strong> ({m.quantization})
                       </p>
                     </div>
 
@@ -373,51 +372,51 @@ export default function LocalModelManager({
                         READY
                       </span>
                     ) : (
-                      <span className="text-[9px] font-bold text-slate-400 bg-[#16171E] border border-[#23242E] px-2 py-0.5 rounded">
+                      <span className="text-[9px] font-bold text-zinc-400 bg-[#16171E] border border-[#23242E] px-2 py-0.5 rounded">
                         {m.size}
                       </span>
                     )}
                   </div>
 
-                  <p className="text-[11px] text-slate-400 leading-relaxed">{m.description}</p>
+                  <p className="text-[11px] text-zinc-400 leading-relaxed">{m.description}</p>
 
                   <div className="space-y-1">
-                    <div className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Strengths:</div>
-                    <ul className="text-[10px] text-slate-300 space-y-0.5">
+                    <div className="text-[9px] font-bold text-zinc-500 uppercase tracking-wider">Strengths:</div>
+                    <ul className="text-[10px] text-zinc-300 space-y-0.5">
                       {m.strengths.map((s, idx) => (
                         <li key={idx} className="flex items-center gap-1.5">
-                          <span className="w-1 h-1 rounded-full bg-indigo-400 shrink-0"></span>
+                          <span className="w-1 h-1 rounded-full bg-zinc-400 shrink-0"></span>
                           <span>{s}</span>
                         </li>
                       ))}
                     </ul>
                   </div>
 
-                  <div className="text-[9px] text-slate-500 font-mono">
-                    System Req: {m.ramRequired}
+                  <div className="text-[9px] text-zinc-500 font-mono">
+                    Runtime: WebAssembly • {m.ramRequired}
                   </div>
                 </div>
 
                 {/* Bottom Actions */}
-                <div className="pt-3 border-t border-[#1C1E26] mt-4 flex items-center justify-between gap-2">
+                <div className="pt-3 border-t border-[#1C1E22] mt-4 flex items-center justify-between gap-2">
                   {m.downloaded ? (
                     <>
                       <button
                         type="button"
-                        onClick={() => handleSelectModel('llama-3-8b')}
+                        onClick={() => handleSelectModel('distilbert-sentiment')}
                         className={`text-xs font-bold px-3 py-1.5 rounded-lg transition cursor-pointer ${
                           isSelected
-                            ? 'bg-indigo-600 text-white shadow-sm'
-                            : 'bg-[#1A1C24] text-slate-300 hover:text-white'
+                            ? 'bg-zinc-100 text-black shadow-sm'
+                            : 'bg-zinc-800 text-zinc-300 hover:text-white'
                         }`}
                       >
                         {isSelected ? '● Active Model' : 'Select Model'}
                       </button>
                       <button
                         type="button"
-                        onClick={() => handleDeleteModel('llama-3-8b')}
+                        onClick={() => handleDeleteModel('distilbert-sentiment')}
                         title="Delete cached weights"
-                        className="text-slate-500 hover:text-rose-400 p-1.5 transition cursor-pointer"
+                        className="text-zinc-500 hover:text-rose-400 p-1.5 transition cursor-pointer"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -427,7 +426,7 @@ export default function LocalModelManager({
                       type="button"
                       disabled={!!downloadingModelId}
                       onClick={() => handleRequestDownload(m)}
-                      className="w-full flex items-center justify-center gap-1.5 py-2 bg-[#18112C] hover:bg-[#20173A] border border-[#342466] text-[#9E8CF4] rounded-lg text-xs font-bold transition cursor-pointer disabled:opacity-40"
+                      className="w-full flex items-center justify-center gap-1.5 py-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-lg text-xs font-bold transition cursor-pointer disabled:opacity-40"
                     >
                       <Download className="w-3.5 h-3.5" />
                       <span>Download Model ({m.size})</span>
@@ -438,17 +437,17 @@ export default function LocalModelManager({
             );
           })()}
 
-          {/* Gemma 2 2B */}
+          {/* Model 2: all-MiniLM-L6-v2 */}
           {(() => {
-            const m = models['gemma-2-2b'];
-            const isSelected = selectedModel === 'gemma-2-2b';
+            const m = models['minilm-embeddings'];
+            const isSelected = selectedModel === 'minilm-embeddings';
             return (
               <div
                 key={m.id}
                 className={`p-4 rounded-xl border flex flex-col justify-between transition ${
                   isSelected
-                    ? 'bg-[#13151D] border-indigo-500/60 shadow-md shadow-indigo-500/5'
-                    : 'bg-[#0E0F14] border-[#1B1C22]'
+                    ? 'bg-[#16181D] border-zinc-400 shadow-md shadow-black/30'
+                    : 'bg-[#0E0F12] border-[#1E2024]'
                 }`}
               >
                 <div className="space-y-2.5">
@@ -456,10 +455,10 @@ export default function LocalModelManager({
                     <div>
                       <div className="text-xs font-bold text-white flex items-center gap-1.5">
                         <span>{m.name}</span>
-                        <span className="text-[10px] font-normal text-slate-400">({m.parameters})</span>
+                        <span className="text-[10px] font-normal text-zinc-400">({m.parameters})</span>
                       </div>
-                      <p className="text-[10px] text-emerald-400 font-mono mt-0.5">
-                        Download Size: <strong className="text-emerald-300 font-bold">{m.size}</strong> ({m.quantization})
+                      <p className="text-[10px] text-zinc-300 font-mono mt-0.5">
+                        Sandbox Weight: <strong className="text-white font-bold">{m.size}</strong> ({m.quantization})
                       </p>
                     </div>
 
@@ -469,51 +468,51 @@ export default function LocalModelManager({
                         READY
                       </span>
                     ) : (
-                      <span className="text-[9px] font-bold text-slate-400 bg-[#16171E] border border-[#23242E] px-2 py-0.5 rounded">
+                      <span className="text-[9px] font-bold text-zinc-400 bg-[#16171E] border border-[#23242E] px-2 py-0.5 rounded">
                         {m.size}
                       </span>
                     )}
                   </div>
 
-                  <p className="text-[11px] text-slate-400 leading-relaxed">{m.description}</p>
+                  <p className="text-[11px] text-zinc-400 leading-relaxed">{m.description}</p>
 
                   <div className="space-y-1">
-                    <div className="text-[9px] font-bold text-slate-500 uppercase tracking-wider">Strengths:</div>
-                    <ul className="text-[10px] text-slate-300 space-y-0.5">
+                    <div className="text-[9px] font-bold text-zinc-500 uppercase tracking-wider">Strengths:</div>
+                    <ul className="text-[10px] text-zinc-300 space-y-0.5">
                       {m.strengths.map((s, idx) => (
                         <li key={idx} className="flex items-center gap-1.5">
-                          <span className="w-1 h-1 rounded-full bg-emerald-400 shrink-0"></span>
+                          <span className="w-1 h-1 rounded-full bg-zinc-400 shrink-0"></span>
                           <span>{s}</span>
                         </li>
                       ))}
                     </ul>
                   </div>
 
-                  <div className="text-[9px] text-slate-500 font-mono">
-                    System Req: {m.ramRequired}
+                  <div className="text-[9px] text-zinc-500 font-mono">
+                    Runtime: WebAssembly • {m.ramRequired}
                   </div>
                 </div>
 
                 {/* Bottom Actions */}
-                <div className="pt-3 border-t border-[#1C1E26] mt-4 flex items-center justify-between gap-2">
+                <div className="pt-3 border-t border-[#1C1E22] mt-4 flex items-center justify-between gap-2">
                   {m.downloaded ? (
                     <>
                       <button
                         type="button"
-                        onClick={() => handleSelectModel('gemma-2-2b')}
+                        onClick={() => handleSelectModel('minilm-embeddings')}
                         className={`text-xs font-bold px-3 py-1.5 rounded-lg transition cursor-pointer ${
                           isSelected
-                            ? 'bg-emerald-600 text-white shadow-sm'
-                            : 'bg-[#1A1C24] text-slate-300 hover:text-white'
+                            ? 'bg-zinc-100 text-black shadow-sm'
+                            : 'bg-zinc-800 text-zinc-300 hover:text-white'
                         }`}
                       >
                         {isSelected ? '● Active Model' : 'Select Model'}
                       </button>
                       <button
                         type="button"
-                        onClick={() => handleDeleteModel('gemma-2-2b')}
+                        onClick={() => handleDeleteModel('minilm-embeddings')}
                         title="Delete cached weights"
-                        className="text-slate-500 hover:text-rose-400 p-1.5 transition cursor-pointer"
+                        className="text-zinc-500 hover:text-rose-400 p-1.5 transition cursor-pointer"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -523,7 +522,7 @@ export default function LocalModelManager({
                       type="button"
                       disabled={!!downloadingModelId}
                       onClick={() => handleRequestDownload(m)}
-                      className="w-full flex items-center justify-center gap-1.5 py-2 bg-[#101D1A] hover:bg-[#152723] border border-[#1E3B33] text-emerald-400 rounded-lg text-xs font-bold transition cursor-pointer disabled:opacity-40"
+                      className="w-full flex items-center justify-center gap-1.5 py-2 bg-zinc-800 hover:bg-zinc-700 border border-zinc-600 text-zinc-100 rounded-lg text-xs font-bold transition cursor-pointer disabled:opacity-40"
                     >
                       <Download className="w-3.5 h-3.5" />
                       <span>Download Model ({m.size})</span>
@@ -537,35 +536,35 @@ export default function LocalModelManager({
       </div>
 
       {/* SECTION 3: Local Private Database (IndexedDB) Management */}
-      <div className="bg-[#101116] border border-[#1B1C22] p-5 rounded-2xl space-y-4">
+      <div className="bg-[#101114] border border-[#1E2024] p-5 rounded-2xl space-y-4">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <div className="text-sm font-bold text-slate-100 flex items-center gap-2">
-              <HardDrive className="w-4 h-4 text-indigo-400" />
+            <div className="text-sm font-bold text-zinc-100 flex items-center gap-2">
+              <HardDrive className="w-4 h-4 text-zinc-300" />
               Local Private Database (IndexedDB)
             </div>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="text-xs text-zinc-400 mt-1">
               In Full-Local mode, reflections and action items are saved directly into your browser's private IndexedDB sandbox.
             </p>
           </div>
-          <span className="text-[10px] font-mono font-bold bg-[#15171C] text-slate-300 border border-[#20222A] px-2.5 py-1 rounded uppercase shrink-0">
+          <span className="text-[10px] font-mono font-bold bg-[#15171C] text-zinc-300 border border-[#20222A] px-2.5 py-1 rounded uppercase shrink-0">
             {dbStats.entryCount} Entries Local
           </span>
         </div>
 
         {/* Database Status Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-          <div className="bg-[#0C0D11] border border-[#17181F] p-3 rounded-xl">
-            <div className="text-[10px] text-slate-500 uppercase tracking-wide">Journal Records</div>
+          <div className="bg-[#0C0D10] border border-[#17181D] p-3 rounded-xl">
+            <div className="text-[10px] text-zinc-500 uppercase tracking-wide">Journal Records</div>
             <div className="text-base font-bold text-white mt-0.5">{dbStats.entryCount}</div>
           </div>
-          <div className="bg-[#0C0D11] border border-[#17181F] p-3 rounded-xl">
-            <div className="text-[10px] text-slate-500 uppercase tracking-wide">Action Items</div>
+          <div className="bg-[#0C0D10] border border-[#17181D] p-3 rounded-xl">
+            <div className="text-[10px] text-zinc-500 uppercase tracking-wide">Action Items</div>
             <div className="text-base font-bold text-white mt-0.5">{dbStats.actionItemCount}</div>
           </div>
-          <div className="bg-[#0C0D11] border border-[#17181F] p-3 rounded-xl col-span-2 sm:col-span-1">
-            <div className="text-[10px] text-slate-500 uppercase tracking-wide">IndexedDB Footprint</div>
-            <div className="text-base font-bold text-indigo-400 mt-0.5">
+          <div className="bg-[#0C0D10] border border-[#17181D] p-3 rounded-xl col-span-2 sm:col-span-1">
+            <div className="text-[10px] text-zinc-500 uppercase tracking-wide">IndexedDB Footprint</div>
+            <div className="text-base font-bold text-zinc-200 mt-0.5">
               {(dbStats.estimatedStorageBytes / 1024).toFixed(1)} KB
             </div>
           </div>
@@ -577,9 +576,9 @@ export default function LocalModelManager({
             type="button"
             onClick={handleExportJson}
             disabled={dbStats.entryCount === 0}
-            className="flex items-center gap-1.5 px-3.5 py-2 bg-[#15171C] hover:bg-[#1B1E24] border border-[#20222A] text-slate-300 hover:text-white rounded-lg text-xs font-semibold transition cursor-pointer disabled:opacity-40"
+            className="flex items-center gap-1.5 px-3.5 py-2 bg-[#15171C] hover:bg-[#1B1E24] border border-[#20222A] text-zinc-300 hover:text-white rounded-lg text-xs font-semibold transition cursor-pointer disabled:opacity-40"
           >
-            <FileJson className="w-3.5 h-3.5 text-indigo-400" />
+            <FileJson className="w-3.5 h-3.5 text-zinc-300" />
             <span>Export Local DB (JSON)</span>
           </button>
 
@@ -599,9 +598,9 @@ export default function LocalModelManager({
       <div className="bg-amber-500/5 border border-amber-500/15 p-4 rounded-xl flex items-start gap-3">
         <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
         <div className="space-y-1">
-          <div className="text-[11px] font-bold text-amber-300 uppercase tracking-wide">⚠ Data Loss Warning</div>
-          <p className="text-[11px] text-slate-400 leading-relaxed">
-            All locally stored data — including journal entries, action items, and downloaded model weights — is saved in your browser's storage (IndexedDB &amp; Cache). <strong className="text-amber-200/80">Clearing your browser cache, site data, or storage will permanently and irreversibly delete all local data.</strong> We strongly recommend exporting a backup regularly using the options above.
+          <div className="text-[11px] font-bold text-amber-300 uppercase tracking-wide">⚠ Storage & Persistence Notice</div>
+          <p className="text-[11px] text-zinc-400 leading-relaxed">
+            All locally stored data — including journal entries, action items, and in-browser micro model weights — is saved in your browser's private sandbox (IndexedDB &amp; CacheStorage). <strong className="text-amber-200/80">Clearing your browser cache or site data will purge local data.</strong> Export JSON backups regularly to keep an offline archive.
           </p>
         </div>
       </div>
@@ -609,37 +608,36 @@ export default function LocalModelManager({
       {/* MODAL 1: Confirm Model Download with Stated Size */}
       {modelToConfirmDownload && (
         <div className="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in select-none">
-          <div className="bg-[#0B0C0F] border border-[#1B1C22] rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-5 text-left">
+          <div className="bg-[#0D0E12] border border-[#1E2026] rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-5 text-left">
             <div className="flex items-start justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+                <div className="w-9 h-9 rounded-xl bg-zinc-800 border border-zinc-700 flex items-center justify-center text-zinc-200">
                   <Download className="w-4 h-4" />
                 </div>
                 <div>
                   <h4 className="text-sm font-bold text-white">
                     Download {modelToConfirmDownload.name}?
                   </h4>
-                  <p className="text-[10px] text-slate-400 font-mono">
-                    Model Size: {modelToConfirmDownload.size} ({modelToConfirmDownload.quantization})
+                  <p className="text-[10px] text-zinc-400 font-mono">
+                    Micro Model Weight: {modelToConfirmDownload.size} ({modelToConfirmDownload.quantization})
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setModelToConfirmDownload(null)}
-                className="text-slate-500 hover:text-slate-300 p-1"
+                className="text-zinc-500 hover:text-zinc-300 p-1"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="space-y-2 text-xs text-slate-300 leading-relaxed bg-[#101116] p-3.5 rounded-xl border border-[#1B1C22]">
+            <div className="space-y-2 text-xs text-zinc-300 leading-relaxed bg-[#121318] p-3.5 rounded-xl border border-[#1E2026]">
               <p>
-                You are about to download the model weights for{' '}
-                <strong className="text-white">{modelToConfirmDownload.name}</strong>, requiring{' '}
-                <strong className="text-indigo-400">{modelToConfirmDownload.size}</strong> of device storage.
+                You are about to stream the ONNX micro model for{' '}
+                <strong className="text-white">{modelToConfirmDownload.name}</strong> directly into your browser's WebAssembly sandbox CacheStorage.
               </p>
-              <p className="text-[11px] text-slate-400">
-                Recommended environment: Unmetered Wi-Fi connection and {modelToConfirmDownload.ramRequired}. The weights will be cached in your local browser sandbox for offline on-device inference.
+              <p className="text-[11px] text-zinc-400">
+                Total transfer: <strong className="text-white">{modelToConfirmDownload.size}</strong>. Once cached, it runs 100% offline and locally inside the browser with zero external server calls.
               </p>
             </div>
 
@@ -647,14 +645,14 @@ export default function LocalModelManager({
               <button
                 type="button"
                 onClick={() => setModelToConfirmDownload(null)}
-                className="px-4 py-2 text-xs font-semibold text-slate-400 hover:text-slate-200 transition cursor-pointer"
+                className="px-4 py-2 text-xs font-semibold text-zinc-400 hover:text-zinc-200 transition cursor-pointer"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={handleConfirmDownload}
-                className="px-5 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl text-xs font-bold transition active:scale-95 cursor-pointer shadow-lg shadow-indigo-600/20"
+                className="px-5 py-2.5 bg-zinc-100 hover:bg-white text-black rounded-xl text-xs font-bold transition active:scale-95 cursor-pointer shadow-lg shadow-black/40"
               >
                 Confirm & Download ({modelToConfirmDownload.size})
               </button>
@@ -666,18 +664,18 @@ export default function LocalModelManager({
       {/* MODAL 2: Wipe Local Database Confirm */}
       {showClearDbConfirm && (
         <div className="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in select-none">
-          <div className="bg-[#0B0C0F] border border-[#1B1C22] rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4 text-left">
+          <div className="bg-[#0D0E12] border border-[#1E2026] rounded-2xl max-w-sm w-full p-6 shadow-2xl space-y-4 text-left">
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400">
                 <Trash2 className="w-4 h-4" />
               </div>
               <div>
                 <h4 className="text-sm font-bold text-white">Clear Local Database?</h4>
-                <p className="text-[10px] text-slate-500 uppercase tracking-wider">Permanent Action</p>
+                <p className="text-[10px] text-zinc-500 uppercase tracking-wider">Permanent Action</p>
               </div>
             </div>
 
-            <p className="text-xs text-slate-300 leading-relaxed">
+            <p className="text-xs text-zinc-300 leading-relaxed">
               This will permanently delete all {dbStats.entryCount} entries stored in your browser's local IndexedDB. Cloud entries will remain unaffected.
             </p>
 
@@ -685,7 +683,7 @@ export default function LocalModelManager({
               <button
                 type="button"
                 onClick={() => setShowClearDbConfirm(false)}
-                className="px-4 py-2 text-xs font-semibold text-slate-400 hover:text-slate-200 transition cursor-pointer"
+                className="px-4 py-2 text-xs font-semibold text-zinc-400 hover:text-zinc-200 transition cursor-pointer"
               >
                 Cancel
               </button>

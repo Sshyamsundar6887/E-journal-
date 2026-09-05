@@ -309,7 +309,7 @@ export async function exportLocalDbAsJson(): Promise<string> {
   return JSON.stringify(
     {
       exportedAt: new Date().toISOString(),
-      app: 'Aura Journal (Full-Local Database)',
+      app: 'Echo Mind (Full-Local Database)',
       formatVersion: 1,
       totalEntries: entries.length,
       entries,

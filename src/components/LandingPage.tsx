@@ -50,7 +50,7 @@ export default function LandingPage({ onAuthSuccess }: LandingPageProps) {
             <BookOpen className="w-4.5 h-4.5 text-white" />
           </div>
           <h1 className="font-bold text-base tracking-tight text-white">
-            Aura <span className="text-indigo-400 font-normal">Journal</span>
+            Echo <span className="text-zinc-400 font-normal">Mind</span>
           </h1>
         </div>
         <div className="flex items-center gap-2 px-3 py-1 bg-emerald-500/10 border border-emerald-500/20 rounded-full">
@@ -127,7 +127,7 @@ export default function LandingPage({ onAuthSuccess }: LandingPageProps) {
             </div>
             <h3 className="font-bold text-white text-sm">Conversational RAG Memory</h3>
             <p className="text-slate-400 text-xs leading-relaxed">
-              Query your previous entries using direct semantic meaning. No exact keyword tags needed. Aura remembers your patterns, growth steps, and breakthroughs.
+              Query your previous entries using direct semantic meaning. No exact keyword tags needed. Echo Mind remembers your patterns, growth steps, and breakthroughs.
             </p>
           </div>
 
@@ -145,7 +145,7 @@ export default function LandingPage({ onAuthSuccess }: LandingPageProps) {
 
       {/* Footer */}
       <footer className="w-full text-center py-6 border-t border-[#1F2229] text-[10px] text-slate-500 font-mono bg-[#0F1115]">
-        <p>&copy; 2026 Aura Journal. Securely containerized and authenticated.</p>
+        <p>&copy; 2026 Echo Mind. Securely containerized and authenticated.</p>
       </footer>
     </div>
   );

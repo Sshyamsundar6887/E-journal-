@@ -32,7 +32,7 @@ export default function App() {
         <div className="w-10 h-10 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center text-white animate-pulse shadow-lg shadow-indigo-500/20">
           <BookOpen className="w-5 h-5" />
         </div>
-        <span className="text-xs font-semibold tracking-wider text-slate-400">Aura Security Handshake...</span>
+        <span className="text-xs font-semibold tracking-wider text-slate-400">Echo Mind Security Handshake...</span>
       </div>
     );
   }

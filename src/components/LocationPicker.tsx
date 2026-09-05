@@ -34,33 +34,47 @@ export default function LocationPicker({ location, onChange, onClose }: Location
       async (position) => {
         const { latitude, longitude } = position.coords;
         try {
-          // Use reverse geocoding via Google Maps Geocoder if available,
-          // otherwise fall back to coordinates display
+          // 1. Try Google Maps Geocoder if loaded
           if (typeof google !== 'undefined' && google.maps && google.maps.Geocoder) {
             const geocoder = new google.maps.Geocoder();
             const response = await geocoder.geocode({
               location: { lat: latitude, lng: longitude },
             });
             if (response.results && response.results[0]) {
-              const name = response.results[0].formatted_address;
-              onChange({ name, lat: latitude, lng: longitude });
-            } else {
-              onChange({
-                name: `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`,
-                lat: latitude,
-                lng: longitude,
-              });
+              onChange({ name: response.results[0].formatted_address, lat: latitude, lng: longitude });
+              return;
             }
-          } else {
-            // Fallback: use coordinates as display name
-            onChange({
-              name: `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`,
-              lat: latitude,
-              lng: longitude,
-            });
           }
+
+          // 2. Free Reverse Geocode Fallback via OpenStreetMap
+          let placeName = `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`;
+          try {
+            const res = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=14&addressdetails=1`,
+              { headers: { 'Accept-Language': 'en' } }
+            );
+            if (res.ok) {
+              const data = await res.json();
+              const addr = data.address || {};
+              const locality = addr.city || addr.town || addr.village || addr.suburb || addr.neighbourhood || '';
+              const region = addr.state || addr.country || '';
+              const formatted = [locality, region].filter(Boolean).join(', ');
+              if (formatted) {
+                placeName = formatted;
+              } else if (data.display_name) {
+                placeName = data.display_name.split(',').slice(0, 2).join(',').trim();
+              }
+            }
+          } catch {
+            // Keep numerical coords fallback
+          }
+
+          onChange({
+            name: placeName,
+            lat: latitude,
+            lng: longitude,
+          });
         } catch (err) {
-          // If geocoding fails, still use raw coordinates
           onChange({
             name: `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`,
             lat: latitude,
