@@ -2,6 +2,9 @@
  * Server Entry Point (Express + Vite Middleware)
  */
 
+import dotenv from "dotenv";
+dotenv.config();
+
 import express, { Request, Response, NextFunction } from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
@@ -762,7 +765,12 @@ async function setupApp() {
     res.status(404).json({ error: `API Route Not Found: ${req.method} ${req.path}` });
   });
 
-  if (process.env.NODE_ENV !== "production") {
+  // Detect production mode: either NODE_ENV is explicitly set, or we're running
+  // the bundled CJS server from the dist/ directory.
+  const isProduction = process.env.NODE_ENV === "production" ||
+    __filename.replace(/\\/g, '/').includes('/dist/');
+
+  if (!isProduction) {
     const vite = await createViteServer({
       server: {
         middlewareMode: true,

@@ -92,3 +92,10 @@ export interface LocalInferenceResult {
   executionTimeMs: number;
 }
 
+export interface EntryLocation {
+  name: string;
+  lat?: number;
+  lng?: number;
+}
+
+

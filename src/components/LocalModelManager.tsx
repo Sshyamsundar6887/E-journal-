@@ -595,6 +595,17 @@ export default function LocalModelManager({
         </div>
       </div>
 
+      {/* Data Loss Disclaimer */}
+      <div className="bg-amber-500/5 border border-amber-500/15 p-4 rounded-xl flex items-start gap-3">
+        <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+        <div className="space-y-1">
+          <div className="text-[11px] font-bold text-amber-300 uppercase tracking-wide">⚠ Data Loss Warning</div>
+          <p className="text-[11px] text-slate-400 leading-relaxed">
+            All locally stored data — including journal entries, action items, and downloaded model weights — is saved in your browser's storage (IndexedDB &amp; Cache). <strong className="text-amber-200/80">Clearing your browser cache, site data, or storage will permanently and irreversibly delete all local data.</strong> We strongly recommend exporting a backup regularly using the options above.
+          </p>
+        </div>
+      </div>
+
       {/* MODAL 1: Confirm Model Download with Stated Size */}
       {modelToConfirmDownload && (
         <div className="fixed inset-0 z-[130] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fade-in select-none">
